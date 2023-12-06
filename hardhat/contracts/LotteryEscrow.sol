@@ -156,9 +156,13 @@ event RequestSent(uint256 requestId, uint32 numWords);
     RequestStatus memory requestStatus = getRandomnessRequestState(requester);
     
     require(requestStatus.fulfilled, "Request not fulfilled");
- uint256 randomWord = requestStatus.randomWords[0];
+    uint256 randomWord = requestStatus.randomWords[0];
+     if (_tokenIdCounter > 0) {
         randomTokenId = randomWord % _tokenIdCounter;
-        return randomTokenId;
+    } else {
+        revert("No tokens minted yet");
+    }
+     return randomTokenId;
 }
 
 
