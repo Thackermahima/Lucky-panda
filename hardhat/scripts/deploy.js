@@ -5,12 +5,10 @@ async function main() {
 
   console.log("Deploying contracts with the account:", deployer.address);
 
-  console.log("Account balance:", (await deployer.getBalance()).toString());
-
   const mintContractParent = await hre.ethers.getContractFactory("mintContractParent");
   const mintcontractParent = await mintContractParent.deploy();
   
-  console.log("mintContractParent contract address:", mintcontractParent.address);
+  console.log("mintContractParent contract address:", mintcontractParent.target);
 }
 
 main()
@@ -19,3 +17,4 @@ main()
     console.error(error);
     process.exit(1);
   });
+  //0x46D9E01A910838F2b7DfE7557fa694c671b3A0A0

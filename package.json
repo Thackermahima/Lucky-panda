@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.14.19",
     "ethers": "^6.9.0",
+    "firebase": "^10.7.0",
     "next": "14.0.3",
     "react": "^18",
     "react-bootstrap": "^2.9.1",

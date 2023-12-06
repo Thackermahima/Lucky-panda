@@ -1,0 +1,1 @@
+export const mintContractParentAddress = '0x46D9E01A910838F2b7DfE7557fa694c671b3A0A0'; 
