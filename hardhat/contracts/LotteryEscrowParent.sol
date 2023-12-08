@@ -58,7 +58,13 @@ function getAllTokenId(address tokenContractAddress) public view returns (uint[]
     } 
     return ret;
 }
-
+  function getWinner(address tokenAddress) public view returns (address) {
+        require(tokenAddress != address(0), "Invalid token address");
+        return LotteryEscrow(tokenAddress).winner();
+    }
+ function callRequestRandomWords(address tokenAddress) public onlyOwner returns(uint256) {
+return LotteryEscrow(tokenAddress).requestRandomWords();       
+    }
 
       function callPurchaseItem(
          uint256 tokenId,
