@@ -16,8 +16,8 @@ import "./LotteryEscrow.sol";
     address vrfCoordinator = 0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625;
         bytes32 vrfKeyHash = 0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c;
         uint64 subscriptionId = 7485;
-    function createToken(string memory name, string memory symbol) public {
-        address _address = address(new LotteryEscrow(name, symbol, vrfCoordinator, vrfKeyHash, subscriptionId ));
+    function createToken(string memory name, string memory symbol, uint256 updateInterval) public {
+        address _address = address(new LotteryEscrow(name, symbol, updateInterval, vrfCoordinator, vrfKeyHash, subscriptionId));
        uint256 count = 0;
        tokens[msg.sender].push(_address);
        count++;       

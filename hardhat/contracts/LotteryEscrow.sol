@@ -3,9 +3,11 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
+import "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
+
 import "./comman/ERC721.sol";
 
-contract LotteryEscrow is ERC721, VRFConsumerBaseV2{
+contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterface{
     uint256 private _tokenIdCounter;
     uint256 public feePercent = 2; //the fee percntage on sales
     address payable public feeAccount;
@@ -13,7 +15,7 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2{
     mapping(uint256 => address payable) public OwnerOfAnNFT;
     mapping(address => uint256[]) public soldItems;
     address payable public winner;
-event RequestSent(uint256 requestId, uint32 numWords);
+    event RequestSent(uint256 requestId, uint32 numWords);
     event RequestFulfilled(uint256 requestId, uint256[] randomWords);
 
     struct RequestStatus {
@@ -62,20 +64,25 @@ event RequestSent(uint256 requestId, uint32 numWords);
     event RandomnessRequestFulfilled(uint256 requestId, uint256[] randomWords);
 
 
-     bytes32 public keyHash;
+    bytes32 public keyHash;
     uint32 public callbackGasLimit = 100000;
     uint16 public requestConfirmations = 3;
     uint32 public numWords = 1;
+    uint256 public immutable interval;
+    uint256 public lastTimeStamp;
 
     constructor(
         string memory _name,
         string memory _symbol,
+        uint256 updateInterval,
         address vrfCoordinator,
         bytes32 vrfKeyHash,
         uint64 subscriptionId
     ) ERC721(_name, _symbol) 
-    VRFConsumerBaseV2(vrfCoordinator) 
+      VRFConsumerBaseV2(vrfCoordinator) 
     {
+        interval = updateInterval;
+        lastTimeStamp = block.timestamp;
         keyHash = vrfKeyHash;
         s_subscriptionId = subscriptionId;
         COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
@@ -136,11 +143,22 @@ event RequestSent(uint256 requestId, uint32 numWords);
         emit RequestFulfilled(_requestId, _randomWords);
     }
 
-    function playLottery() public {
-        uint256 randomTokenId = getRandomTokenId(msg.sender);
-        winner = OwnerOfAnNFT[randomTokenId];
-        winner.transfer(address(this).balance);
-    }
+   function playLottery() public {
+    require(address(this).balance > 0, "No funds available for transfer");
+    
+    uint256 randomTokenId = getRandomTokenId(msg.sender);
+    require(randomTokenId < _tokenIdCounter, "Invalid random token ID");
+
+        RequestStatus memory requestStatus = getRandomnessRequestState(msg.sender);
+    require(requestStatus.fulfilled, "Randomness request not fulfilled");
+
+
+    winner = OwnerOfAnNFT[randomTokenId];
+    require(winner != address(0), "Winner address is invalid");
+    
+    payable(winner).transfer(address(this).balance);
+}
+
   function getRandomnessRequestState(address requester)
         public
         view
@@ -165,8 +183,22 @@ event RequestSent(uint256 requestId, uint32 numWords);
      return randomTokenId;
 }
 
-
-
+function checkUpkeep(
+        bytes calldata /* checkData */
+    )
+        external
+        view
+        override
+        returns (bool upkeepNeeded, bytes memory /* performData */)
+    {
+        upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
+    }
+function performUpkeep(bytes calldata /* performData */) external override {
+        if ((block.timestamp - lastTimeStamp) > interval) {
+            lastTimeStamp = block.timestamp;
+           playLottery();
+        }
+    }
     function transferTokens(
         address from,
         address payable to,
