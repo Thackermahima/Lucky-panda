@@ -9,7 +9,6 @@ import "./LotteryEscrow.sol";
     uint public getNFTCount; 
     uint getAddressCount;
     mapping(address => address[]) private tokens;
-    // mapping(address => uint256[]) counts;
     mapping (address => uint256[] ) contractTokenIds;
     mapping (address => string) collections;
     mapping (address => uint256) collectionsOfTokenId;
@@ -17,7 +16,7 @@ import "./LotteryEscrow.sol";
         bytes32 vrfKeyHash = 0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c;
         uint64 subscriptionId = 7485;
     function createToken(string memory name, string memory symbol, uint256 updateInterval) public {
-        address _address = address(new LotteryEscrow(name, symbol, updateInterval, vrfCoordinator, vrfKeyHash, subscriptionId));
+       address _address = address(new LotteryEscrow(name, symbol, updateInterval, vrfCoordinator, vrfKeyHash, subscriptionId));
        uint256 count = 0;
        tokens[msg.sender].push(_address);
        count++;       
@@ -33,7 +32,6 @@ import "./LotteryEscrow.sol";
         return collectionsOfTokenId[collectionContract];
     }
     function bulkMintERC721(
-        //address payable mintor,
         address payable tokenAddress,
         uint256 start,
         uint256 end,
@@ -66,15 +64,19 @@ function getAllTokenId(address tokenContractAddress) public view returns (uint[]
 return LotteryEscrow(tokenAddress).requestRandomWords();       
     }
 
-      function callPurchaseItem(
-         uint256 tokenId,
-         address tokenAddress,
-         address collectionContract
-      )public payable{
-          IERC721(tokenAddress).getApproved(tokenId) == tokenAddress;
-        require(msg.sender == IERC721(tokenAddress).ownerOf(tokenId), "caller is not token owner");
-        LotteryEscrow(tokenAddress).purchaseItem{value: msg.value}(tokenId,collectionContract);
-      }
+    function callPurchaseItem(
+    uint256 tokenId,
+    address tokenAddress,
+    address collectionContract
+) public payable {
+    IERC721(tokenAddress).getApproved(tokenId) == tokenAddress;
+    require(msg.sender == IERC721(tokenAddress).ownerOf(tokenId), "caller is not token owner");
+    LotteryEscrow(tokenAddress).purchaseItem{value: msg.value}(tokenId, collectionContract);
+}
+   function getSoldItems(address tokenAddress, address collectionContract) public view returns(uint256[] memory){
+    return LotteryEscrow(tokenAddress).getPurchaseItem(collectionContract);
+    }
+      
       function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
       }

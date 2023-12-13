@@ -4,7 +4,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
-
 import "./comman/ERC721.sol";
 
 contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterface{
@@ -94,9 +93,9 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
         uint256 tokenId = _tokenIdCounter;
          require(OwnerOfAnNFT[tokenId] == address(0), "The tokenId is already taken");
         // Store the owner of the tokenId or NFT
-        OwnerOfAnNFT[tokenId] = to;
-        _safeMint(msg.sender, tokenId);
-        marketItems[tokenId] = MarketItem(
+            OwnerOfAnNFT[tokenId] = to;
+           _safeMint(msg.sender, tokenId);
+            marketItems[tokenId] = MarketItem(
             address(this),
             tokenId,
             payable(to),
@@ -108,14 +107,11 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
         emit MarketItemCreated(address(this), tokenId, to, address(0), price);
         return tokenId;
     }
-    
-
-     
+         
          function requestRandomWords()
         external
         returns (uint256 requestId)
     {
-        // Will revert if subscription is not set and funded.
         requestId = COORDINATOR.requestRandomWords(
             keyHash,
             s_subscriptionId,
@@ -213,7 +209,6 @@ function performUpkeep(bytes calldata /* performData */) external override {
     }
 
     function purchaseItem(uint256 tokenId, address collectionContract) external payable {
-        //uint256 _totalPrice = getTotalPrice(tokenId);
         MarketItem memory item = marketItems[tokenId];
         IERC721(item.nftContract).getApproved(tokenId);
         require(!item.sold, "item already sold");

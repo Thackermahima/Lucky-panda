@@ -5,10 +5,10 @@ async function main() {
 
   console.log("Deploying contracts with the account:", deployer.address);
 
-  const mintContractParent = await hre.ethers.getContractFactory("mintContractParent");
-  const mintcontractParent = await mintContractParent.deploy();
+  const LotteryEscrowParent = await hre.ethers.getContractFactory("LotteryEscrowParent");
+  const LotteryEscrowParentContract = await LotteryEscrowParent.deploy();
   
-  console.log("mintContractParent contract address:", mintcontractParent.target);
+  console.log("LotteryEscrowParent contract address:", LotteryEscrowParentContract.target);
 }
 
 main()

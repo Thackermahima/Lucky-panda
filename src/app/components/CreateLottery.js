@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import {
   Card,
   CardContent,
@@ -11,8 +11,30 @@ import {
   MenuItem,
   Box,
 } from "@mui/material";
-
+import { LuckyPandaContext } from "./context/LuckyPandaContext";
 const CreateLottery = () => {
+
+  const luckyPandaContext = useContext(LuckyPandaContext);
+  const {
+    ImgArr,
+    AllTokenURIs,
+    name,
+    nameEvent,
+    symbol,
+    symbolEvent,
+    tokenPrice,
+    tokenPriceEvent,
+    tokenQuantity,
+    tokenQuantityEvent,
+    resultTime,
+    tokenResultTimeEvent,
+    uploadImg,
+    tokenImgEvent,
+    loading,
+    onFormSubmit,
+    getCollection,
+    AllFilesArr
+  } = luckyPandaContext;
   return (
     <Box
       display="flex"
@@ -27,7 +49,7 @@ const CreateLottery = () => {
 </Typography>
 
 
-          <form>
+          <form onSubmit={onFormSubmit}>
           <InputLabel htmlFor="name">Name</InputLabel>
             <FormControl fullWidth margin="normal" variant="outlined">
               <TextField
@@ -37,6 +59,8 @@ const CreateLottery = () => {
                 variant="outlined"
                 type="text"
                 placeholder="Enter your lottery colletion name"
+                value={name}
+                onChange={nameEvent}
               />
             </FormControl>
             <InputLabel htmlFor="symbol">Symbol</InputLabel>
@@ -48,6 +72,8 @@ const CreateLottery = () => {
                 variant="outlined"
                 type="text"
                 placeholder="Enter symbol"
+                value={symbol}
+                onChange={symbolEvent}
               />
             </FormControl>
             <InputLabel htmlFor="totalTokenSupply">Total Token Supply</InputLabel>
@@ -59,6 +85,8 @@ const CreateLottery = () => {
                 size="small"
                 variant="outlined"
                 placeholder="Enter token supply"
+                value={tokenQuantity}
+                onChange={tokenQuantityEvent}
               />
             </FormControl>
             <InputLabel htmlFor="price">Price</InputLabel>
@@ -71,7 +99,9 @@ const CreateLottery = () => {
                 variant="outlined"
                 placeholder="0.00"
                 step="0.01"
-                />
+                value={tokenPrice}
+                onChange={tokenPriceEvent}
+/>
             </FormControl>
             <InputLabel htmlFor="image">Upload Image</InputLabel>
             <FormControl fullWidth margin="normal" variant="outlined">
@@ -81,6 +111,7 @@ const CreateLottery = () => {
                 size="small"
                 type="file"
                 variant="outlined"
+                onChange={tokenImgEvent}
               />
             </FormControl>
             <InputLabel htmlFor="resultTime">Result Time</InputLabel>
@@ -88,8 +119,10 @@ const CreateLottery = () => {
               <Select
                 // label="Result Time"
                 id="resultTime"
-                defaultValue={10}
+                value={resultTime}
+                onChange={tokenResultTimeEvent}
               >
+                <MenuItem value={1}>1 minutes</MenuItem>
                 <MenuItem value={5}>5 minutes</MenuItem>
                 <MenuItem value={10}>10 minutes</MenuItem>
                 <MenuItem value={15}>15 minutes</MenuItem>
@@ -97,7 +130,8 @@ const CreateLottery = () => {
             </FormControl>
 
             <Button type="submit" variant="contained" sx={{ backgroundColor: "#D82148", textTransform: 'capitalize', border: '2px solid #D82148', fontWeight: 'bold', marginTop: '25px', margin: 'auto',  // Center horizontally
-    display: 'block'}}>
+    display: 'block'}}
+    >
               Create Collection
             </Button>
           </form>
