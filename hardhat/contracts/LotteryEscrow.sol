@@ -207,11 +207,10 @@ function performUpkeep(bytes calldata /* performData */) external override {
             require(to.send(amount), "Transfer of ETH to receiver failed");
         }
     }
-
     function purchaseItem(uint256 tokenId, address collectionContract) external payable {
         MarketItem memory item = marketItems[tokenId];
-        IERC721(item.nftContract).getApproved(tokenId);
         require(!item.sold, "item already sold");
+        IERC721(item.nftContract).approve(msg.sender, tokenId);
         payable(item.seller).transfer(msg.value);
         item.sold = true; 
         IERC721(item.nftContract).transferFrom(item.seller, msg.sender, tokenId);
@@ -219,6 +218,7 @@ function performUpkeep(bytes calldata /* performData */) external override {
         soldItems[collectionContract].push(tokenId);
         emit Bought(address(this), item.tokenId, msg.value, item.seller, msg.sender);
     } 
+
     function getPurchaseItem(address  collectionContract) public view returns(uint256[] memory){
         return soldItems[collectionContract];
     }

@@ -28,13 +28,13 @@ const LuckyDrawCollection = () => {
         );
  
   
-  const allContractAddresses = await lotteryContract.getContractAddresses();
+  const allContractAddresses = await lotteryContract.getAllContractAddresses();
   console.log(allContractAddresses, "allContractAddress");
   const collectionuris = await Promise.all(
     allContractAddresses.map(async(addrs) => {
       const uri = await lotteryContract.getCollectionUri(addrs);
-      // const tokenId = await lotteryContract.getAllTokenId(addrs);
-      // console.log(tokenId, "tokenIds");
+      const tokenId = await lotteryContract.getAllTokenId(addrs);
+      console.log(tokenId, "tokenIds");
       console.log(addrs, "addrs from collectionuris");
       console.log(uri, "uri from collectionuris");
       return {address: addrs, uri: uri};
@@ -51,12 +51,14 @@ async function purchaseItem(tokenID, address, price){
     lotteryEscrowParentABI,
     signer
   );
-  console.log(tokenID,address, price,"purchaseItem function argument")
+  console.log(tokenID,address, price,"purchaseItem function argument");
+  console.log(LotteryEscrowParentContract,{ value: ethers.parseUnits(price,"ether")},"msg.value");
   const purchaseItem = await lotteryContract.callPurchaseItem(tokenID,address, LotteryEscrowParentContract,{ value: ethers.parseUnits(price,"ether")});
+  console.log(purchaseItem,"PurchaseItem");
   const txBuyNFT = await purchaseItem.wait();
   if(txBuyNFT){
     console.log("NFT is purchase");
-  }
+  } 
 }
 useEffect(() => {
   getAllCollection();
@@ -135,6 +137,7 @@ Explore Lottery Collections
           return (
             <>
             <img src={img.url} height="200px" width="500px"/>
+
             <button class="btn btn-outline-success mb-5" onClick={() => purchaseItem(img.tokenID, i.address, i.price)}>Buy for {i.price}</button>
             </>
 
