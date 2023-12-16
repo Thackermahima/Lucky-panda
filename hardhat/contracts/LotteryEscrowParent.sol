@@ -77,7 +77,7 @@ return LotteryEscrow(tokenAddress).requestRandomWords();
     LotteryEscrow(tokenAddress).purchaseItem(tokenId, msg.sender);
 }
    function getSoldItems(address tokenAddress) public view returns(uint256[] memory){
-    return LotteryEscrow(tokenAddress).getPurchaseItem();
+    return LotteryEscrow(tokenAddress).getAllSoldItems();
     }
       
       function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {

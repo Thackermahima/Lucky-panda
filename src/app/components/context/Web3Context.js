@@ -20,7 +20,7 @@ export const Web3ContextProvider = (props) => {
   useEffect(() => {
     const initialize = async () => {
       const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = provider.getSigner();
+      const signer = await provider.getSigner();
 
       setProvider(provider);
       setSigner(signer);

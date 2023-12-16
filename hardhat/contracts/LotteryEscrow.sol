@@ -11,7 +11,7 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
     uint256 public feePercent = 2; //the fee percntage on sales
     mapping(uint256 => MarketItem) public marketItems;
     mapping(uint256 => address payable) public OwnerOfAnNFT;
-    mapping(address => uint256[]) public soldItems;
+    uint256[] public allSoldItems;
     address payable public winner;
     uint256 public winnerPercentage;
     event RequestSent(uint256 requestId, uint32 numWords);
@@ -230,12 +230,12 @@ function performUpkeep(bytes calldata /* performData */) external override {
         item.sold = true; 
         IERC721(item.nftContract).transferFrom(item.seller, to , tokenId);
         marketItems[tokenId].owner = payable(to);
-        soldItems[address(this)].push(tokenId);
+        allSoldItems.push(tokenId);
         emit Bought(address(this), item.tokenId, msg.value, item.seller, to);
     } 
 
-    function getPurchaseItem() public view returns(uint256[] memory){
-        return soldItems[address(this)];
+    function getAllSoldItems() external view returns (uint256[] memory) {
+        return allSoldItems;
     }
     function getTotalPrice(uint256 tokenId) public view returns (uint256) {
         return ((marketItems[tokenId].price * (100 + feePercent)) / 100);

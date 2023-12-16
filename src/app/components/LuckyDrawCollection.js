@@ -33,8 +33,8 @@ const LuckyDrawCollection = () => {
   const collectionuris = await Promise.all(
     allContractAddresses.map(async(addrs) => {
       const uri = await lotteryContract.getCollectionUri(addrs);
-      const tokenId = await lotteryContract.getAllTokenId(addrs);
-      console.log(tokenId, "tokenIds");
+      // const tokenId = await lotteryContract.getAllTokenId(addrs);
+      // console.log(tokenId, "tokenIds");
       console.log(addrs, "addrs from collectionuris");
       console.log(uri, "uri from collectionuris");
       return {address: addrs, uri: uri};
@@ -77,7 +77,7 @@ useEffect(() => {
     );
   // // let tokenIds = await lotteryContract.getAllTokenId(collection.address);
   // // setAllTokenIds(tokenIds.toString());
-  let getSoldItems = await lotteryContract.getSoldItems(collection.address, LotteryEscrowParentContract);
+  let getSoldItems = await lotteryContract.getSoldItems(collection.address);
   console.log(getSoldItems, "getSoldItems");
     axios.get(collection.uri)
      .then((response) => {
