@@ -18,6 +18,7 @@ export const LuckyPandaContextProvider = (props) => {
     const [tokenQuantity, setTokenQuantity] = useState("");
     const [uploadImg, setUploadedImg] = useState("");
     const [resultTime, setResultTime] = useState(1);
+    const [winnerPercentage, setWinnerPercentage] = useState(10);
     const [loading, setLoading] = useState(false);
     const [AllTokenIds, setAllTokenIds] = useState();
     const [ImgArr, setImgArr] = useState([]);
@@ -46,6 +47,10 @@ export const LuckyPandaContextProvider = (props) => {
     };  
     const tokenResultTimeEvent = (e) => {
       setResultTime(e.target.value);
+    };
+    const tokenWinnerPercentageEvent = (e) => {
+      // const percentage = parseInt(e.target.value);
+      setWinnerPercentage(e.target.value);
     };
     const projectId = process.env.REACT_NEXT_APP_INFURA_PROJECT_KEY;
     const projectSecret = process.env.REACT_NEXT_APP_INFURA_SECRET_KEY;
@@ -93,20 +98,18 @@ export const LuckyPandaContextProvider = (props) => {
           lotteryEscrowParentABI,
           signer
         );
-    
+    console.log(name, symbol);
+    console.log(winnerPercentage,"winnerPercentage");
+    const winnerPercentageValue = parseInt(winnerPercentage, 10)
+    console.log(winnerPercentageValue, "winnerPercentageValue");
+    const resultTimeValue = resultTime * 60;
+    console.log(resultTimeValue, "result time");
         let transactionCreate = await lotteryContract.createToken(
           name,
           symbol,
-          resultTime * 60
-        );
-        // let txc = await transactionCreate.wait();
-        // if (txc) {
-        //   setLoading(false);
-        //   console.log(txc, "Successfully created!");
-        // }
-        // let event = txc.events[0];
-        // console.log(event,"event");
-        // let tokenContractAddress = event.args[1];    
+          resultTimeValue,
+          winnerPercentageValue    
+              );  
         let txc = await transactionCreate.wait();
         let tokenContractAddress;
 if (txc.status === 1) {
@@ -119,7 +122,6 @@ if (txc.status === 1) {
     console.log(tokenContractAddress, "Token contract address");
      let userAdd = localStorage.getItem("address");
         localStorage.setItem("tokenContractAddress", tokenContractAddress);
-    // Now you can use contractAddress as needed
   } else {
     console.error("No logs found in the transaction receipt.");
   }
@@ -129,6 +131,8 @@ if (txc.status === 1) {
        
     console.log(tokenPrice,"tokenPrice");
     console.log(ethers.parseUnits(tokenPrice.toString(), "ether"),"tokenPrice");
+    console.log(tokenContractAddress, "tokenContractAddress");
+    console.log(tokenQuantity, "tokenQuantiy");
         let transactionBulkMint = await lotteryContract.bulkMintERC721(
           tokenContractAddress,
           0,
@@ -220,6 +224,7 @@ if (txc.status === 1) {
       quantity: tokenQuantity,
       imgURl: uploadImg,
       resultTime: resultTime,
+      winnerPercentage: winnerPercentage, 
     };
 
     return(
@@ -239,6 +244,8 @@ if (txc.status === 1) {
           tokenResultTimeEvent,
           uploadImg,
           tokenImgEvent,
+          tokenWinnerPercentageEvent,
+          winnerPercentage,
           loading,
           onFormSubmit,
           getCollection,

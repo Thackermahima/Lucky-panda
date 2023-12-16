@@ -9,11 +9,11 @@ import "./comman/ERC721.sol";
 contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterface{
     uint256 private _tokenIdCounter;
     uint256 public feePercent = 2; //the fee percntage on sales
-    address payable public feeAccount;
     mapping(uint256 => MarketItem) public marketItems;
     mapping(uint256 => address payable) public OwnerOfAnNFT;
     mapping(address => uint256[]) public soldItems;
     address payable public winner;
+    uint256 public winnerPercentage;
     event RequestSent(uint256 requestId, uint32 numWords);
     event RequestFulfilled(uint256 requestId, uint256[] randomWords);
 
@@ -74,6 +74,7 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
         string memory _name,
         string memory _symbol,
         uint256 updateInterval,
+        uint256 _winnerPercentage,
         address vrfCoordinator,
         bytes32 vrfKeyHash,
         uint64 subscriptionId
@@ -82,6 +83,7 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
     {
         interval = updateInterval;
         lastTimeStamp = block.timestamp;
+        winnerPercentage = _winnerPercentage;
         keyHash = vrfKeyHash;
         s_subscriptionId = subscriptionId;
         COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
@@ -151,8 +153,16 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
 
     winner = OwnerOfAnNFT[randomTokenId];
     require(winner != address(0), "Winner address is invalid");
-    
-    payable(winner).transfer(address(this).balance);
+    uint256 totalPrize = address(this).balance;
+    uint256 winnerAmount = (totalPrize * winnerPercentage) / 100;
+    uint256 creatorAmount = totalPrize - winnerPercentage;
+
+     // Deduct fees from the winner and creator amounts
+    uint256 winnerFinalAmount = winnerAmount - ((winnerAmount * feePercent) / 100);
+    uint256 creatorFinalAmount = creatorAmount - ((creatorAmount * feePercent) / 100);
+
+    payable(winner).transfer(winnerFinalAmount);
+    payable(msg.sender).transfer(creatorFinalAmount);    
 }
 
   function getRandomnessRequestState(address requester)
@@ -189,6 +199,7 @@ function checkUpkeep(
     {
         upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
     }
+   
 function performUpkeep(bytes calldata /* performData */) external override {
         if ((block.timestamp - lastTimeStamp) > interval) {
             lastTimeStamp = block.timestamp;
@@ -207,20 +218,24 @@ function performUpkeep(bytes calldata /* performData */) external override {
             require(to.send(amount), "Transfer of ETH to receiver failed");
         }
     }
-    function purchaseItem(uint256 tokenId, address collectionContract) external payable {
+    function purchaseItem(uint256 tokenId, address to) external payable {
+        uint256 _totalPrice = getTotalPrice(tokenId);
         MarketItem memory item = marketItems[tokenId];
+           require(
+            msg.value >= _totalPrice,
+            "not enough matic to cover item price and market fee"
+        );
         require(!item.sold, "item already sold");
-        IERC721(item.nftContract).approve(msg.sender, tokenId);
-        payable(item.seller).transfer(msg.value);
+        payable(item.seller).transfer(item.price);
         item.sold = true; 
-        IERC721(item.nftContract).transferFrom(item.seller, msg.sender, tokenId);
-        marketItems[tokenId].owner = payable(msg.sender);
-        soldItems[collectionContract].push(tokenId);
-        emit Bought(address(this), item.tokenId, msg.value, item.seller, msg.sender);
+        IERC721(item.nftContract).transferFrom(item.seller, to , tokenId);
+        marketItems[tokenId].owner = payable(to);
+        soldItems[address(this)].push(tokenId);
+        emit Bought(address(this), item.tokenId, msg.value, item.seller, to);
     } 
 
-    function getPurchaseItem(address  collectionContract) public view returns(uint256[] memory){
-        return soldItems[collectionContract];
+    function getPurchaseItem() public view returns(uint256[] memory){
+        return soldItems[address(this)];
     }
     function getTotalPrice(uint256 tokenId) public view returns (uint256) {
         return ((marketItems[tokenId].price * (100 + feePercent)) / 100);

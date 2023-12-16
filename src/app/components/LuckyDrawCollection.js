@@ -51,9 +51,8 @@ async function purchaseItem(tokenID, address, price){
     lotteryEscrowParentABI,
     signer
   );
-  console.log(tokenID,address, price,"purchaseItem function argument");
-  console.log(LotteryEscrowParentContract,{ value: ethers.parseUnits(price,"ether")},"msg.value");
-  const purchaseItem = await lotteryContract.callPurchaseItem(tokenID,address, LotteryEscrowParentContract,{ value: ethers.parseUnits(price,"ether")});
+  console.log(tokenID,address, price,  "purchaseItem function argument");
+  const purchaseItem = await lotteryContract.callPurchaseItem(tokenID,address , { value: ethers.parseUnits(price.toString(), "ether"), });
   console.log(purchaseItem,"PurchaseItem");
   const txBuyNFT = await purchaseItem.wait();
   if(txBuyNFT){
@@ -137,7 +136,9 @@ Explore Lottery Collections
           return (
             <>
             <img src={img.url} height="200px" width="500px"/>
-
+{console.log(img.tokenID, "img.tokenId")}
+{console.log(i.price, "i.price")}
+{console.log(i.address, "i.address")}
             <button class="btn btn-outline-success mb-5" onClick={() => purchaseItem(img.tokenID, i.address, i.price)}>Buy for {i.price}</button>
             </>
 

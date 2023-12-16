@@ -32,6 +32,8 @@ const CreateLottery = () => {
     tokenImgEvent,
     loading,
     onFormSubmit,
+    tokenWinnerPercentageEvent,
+    winnerPercentage,
     getCollection,
     AllFilesArr
   } = luckyPandaContext;
@@ -113,6 +115,26 @@ const CreateLottery = () => {
                 variant="outlined"
                 onChange={tokenImgEvent}
               />
+            </FormControl>
+            <InputLabel htmlFor="resultTime">Winner Price</InputLabel>
+            <FormControl fullWidth margin="normal" variant="outlined">
+              <Select
+                // label="Result Time"
+                id="winnerPercentage"
+                value={winnerPercentage}
+                onChange={tokenWinnerPercentageEvent}
+              >
+                <MenuItem value={10}>10%</MenuItem>
+                <MenuItem value={20}>20%</MenuItem>
+                <MenuItem value={30}>30%</MenuItem>
+                <MenuItem value={40}>40%</MenuItem>
+                <MenuItem value={50}>50%</MenuItem>
+                <MenuItem value={60}>60%</MenuItem>
+                <MenuItem value={70}>70%</MenuItem>
+                <MenuItem value={80}>80%</MenuItem>
+                <MenuItem value={90}>90%</MenuItem>
+                <MenuItem value={100}>100%</MenuItem>
+              </Select>
             </FormControl>
             <InputLabel htmlFor="resultTime">Result Time</InputLabel>
             <FormControl fullWidth margin="normal" variant="outlined">

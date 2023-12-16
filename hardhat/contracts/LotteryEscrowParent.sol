@@ -16,8 +16,8 @@ import "./LotteryEscrow.sol";
     address vrfCoordinator = 0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625;
         bytes32 vrfKeyHash = 0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c;
         uint64 subscriptionId = 7485;
-    function createToken(string memory name, string memory symbol, uint256 updateInterval) public {
-       address _address = address(new LotteryEscrow(name, symbol, updateInterval, vrfCoordinator, vrfKeyHash, subscriptionId));
+    function createToken(string memory name, string memory symbol, uint256 updateInterval, uint256 winnerPercentage) public {
+       address _address = address(new LotteryEscrow(name, symbol, updateInterval,winnerPercentage, vrfCoordinator, vrfKeyHash, subscriptionId));
        uint256 count = 0;
        tokens[msg.sender].push(_address);
        CollectionAddresses.push(_address);
@@ -72,15 +72,12 @@ return LotteryEscrow(tokenAddress).requestRandomWords();
 
     function callPurchaseItem(
     uint256 tokenId,
-    address tokenAddress,
-    address collectionContract
+    address tokenAddress
 ) public payable {
-    // IERC721(tokenAddress).getApproved(tokenId) == tokenAddress;
-    // require(msg.sender == IERC721(tokenAddress).ownerOf(tokenId), "caller is not token owner");
-    LotteryEscrow(tokenAddress).purchaseItem{value: msg.value}(tokenId, collectionContract);
+    LotteryEscrow(tokenAddress).purchaseItem(tokenId, msg.sender);
 }
-   function getSoldItems(address tokenAddress, address collectionContract) public view returns(uint256[] memory){
-    return LotteryEscrow(tokenAddress).getPurchaseItem(collectionContract);
+   function getSoldItems(address tokenAddress) public view returns(uint256[] memory){
+    return LotteryEscrow(tokenAddress).getPurchaseItem();
     }
       
       function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
