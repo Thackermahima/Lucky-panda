@@ -1,4 +1,4 @@
-export const LotteryEscrowParentContract = '0xe36aFFeBB255765F376A6aF45D438eF628c29eE7'; 
+export const LotteryEscrowParentContract = '0x23BF5b8D2CC93F572b20B233B4a48D664e19AB4E'; 
 
 export const lotteryEscrowParentABI = [
 	{
@@ -452,6 +452,7 @@ export const lotteryEscrowParentABI = [
 		"type": "function"
 	}
 ]
+
 export const lotteryEscrowABI = [
 	{
 		"inputs": [

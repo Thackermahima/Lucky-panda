@@ -98,17 +98,25 @@ export const LuckyPandaContextProvider = (props) => {
           lotteryEscrowParentABI,
           signer
         );
+        console.log(lotteryContract, "lotteryContract");
     console.log(name, symbol);
     console.log(winnerPercentage,"winnerPercentage");
     const winnerPercentageValue = parseInt(winnerPercentage, 10)
     console.log(winnerPercentageValue, "winnerPercentageValue");
     const resultTimeValue = resultTime * 60;
     console.log(resultTimeValue, "result time");
+    const proxyBooksObj = new Proxy(lotteryContract, {
+      get: (target, key) => {
+        console.log(`Fetching book ${key} by ${target[key]}`);
+        return target[key];
+      }
+    })
+    console.log(proxyBooksObj,"proxyBooksObj");
         let transactionCreate = await lotteryContract.createToken(
           name,
           symbol,
-          resultTimeValue,
-          winnerPercentageValue    
+          resultTime * 60,
+          winnerPercentage    
               );  
         let txc = await transactionCreate.wait();
         let tokenContractAddress;
