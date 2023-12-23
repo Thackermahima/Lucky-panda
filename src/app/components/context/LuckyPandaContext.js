@@ -6,7 +6,6 @@ import {
   lotteryEscrowParentABI,
   lotteryEscrowABI
 } from '../../constants/abi';
-require('dotenv').config();
 const ethers = require("ethers") 
 
 export const LuckyPandaContext = createContext();
@@ -93,6 +92,7 @@ export const LuckyPandaContextProvider = (props) => {
         const address = accounts[0];
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
+        console.log(signer.getChainId, "getChainId");
         const lotteryContract = new ethers.Contract(
           LotteryEscrowParentContract,
           lotteryEscrowParentABI,

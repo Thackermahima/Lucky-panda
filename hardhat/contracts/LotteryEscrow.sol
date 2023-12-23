@@ -8,6 +8,7 @@ import "./comman/ERC721.sol";
 
 contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterface{
     uint256 private _tokenIdCounter;
+     address payable public immutable feeAccount;
     uint256 public feePercent = 2; //the fee percntage on sales
     mapping(uint256 => MarketItem) public marketItems;
     mapping(uint256 => address payable) public OwnerOfAnNFT;
@@ -81,6 +82,7 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
     ) ERC721(_name, _symbol) 
       VRFConsumerBaseV2(vrfCoordinator) 
     {
+        feeAccount = payable(address(this));
         interval = updateInterval;
         lastTimeStamp = block.timestamp;
         winnerPercentage = _winnerPercentage;
@@ -226,12 +228,13 @@ function performUpkeep(bytes calldata /* performData */) external override {
             "not enough matic to cover item price and market fee"
         );
         require(!item.sold, "item already sold");
-        payable(item.seller).transfer(item.price);
+        item.seller.transfer(item.price);
+        feeAccount.transfer(_totalPrice - item.price);
         item.sold = true; 
-        IERC721(item.nftContract).transferFrom(item.seller, to , tokenId);
+        IERC721(item.nftContract).transferFrom(item.seller, to, tokenId);
         marketItems[tokenId].owner = payable(to);
         allSoldItems.push(tokenId);
-        emit Bought(address(this), item.tokenId, msg.value, item.seller, to);
+        emit Bought(address(this), item.tokenId, item.price, item.seller, to);
     } 
 
     function getAllSoldItems() external view returns (uint256[] memory) {

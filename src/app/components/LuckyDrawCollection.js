@@ -12,7 +12,7 @@ const LuckyDrawCollection = () => {
   const [tokenAddresses, setTokenAddresses] = useState([]);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [price, setPrice] = useState('');
   async function getAllCollection(){
   let getCollectionOfUri;
   const accounts = await window.ethereum.request({
@@ -43,7 +43,8 @@ const LuckyDrawCollection = () => {
     );
   setCollectionUris(collectionuris);
 }
-async function purchaseItem(tokenID, address, price){
+
+async function purchaseItem(tokenID, address) {
   const provider = new ethers.BrowserProvider(window.ethereum);
   const signer = await provider.getSigner();
   const lotteryContract = new ethers.Contract(
@@ -51,14 +52,35 @@ async function purchaseItem(tokenID, address, price){
     lotteryEscrowParentABI,
     signer
   );
-  console.log(tokenID,address, price,  "purchaseItem function argument");
-  const purchaseItem = await lotteryContract.callPurchaseItem(tokenID,address , { value: ethers.parseUnits(price.toString(), "ether"), });
-  console.log(purchaseItem,"PurchaseItem");
-  const txBuyNFT = await purchaseItem.wait();
-  if(txBuyNFT){
-    console.log("NFT is purchase");
-  } 
+
+  // Fetch the total price from the contract
+  const totalPrice = await lotteryContract.getTotalPrice(address, tokenID);
+
+  // Convert the total price (BigNumber) to a string for the transaction
+  const totalPriceString = totalPrice.toString();
+
+  console.log(tokenID, address, totalPriceString, "callPurchaseArguments");
+  const valueToSend = ethers.parseUnits(totalPriceString, "wei");
+
+  try {
+    console.log("Sending transaction with value:", valueToSend.toString());
+    const addresss = await signer.getAddress();
+    const balance = await provider.getBalance(addresss);
+    console.log("Account balance:", ethers.formatEther(balance), "MATIC");
+    
+    const purchaseItemTx = await lotteryContract.callPurchaseItem(tokenID, address, { value: valueToSend });
+    const txBuy = await purchaseItemTx.wait()
+
+    if (txBuy) {
+      console.log("NFT purchased");
+    } else {
+      console.log("failed");
+    }
+  } catch (error) {
+    console.error("Transaction failed:", error.message);
+  }
 }
+
 useEffect(() => {
   getAllCollection();
 }, []);
@@ -79,6 +101,7 @@ useEffect(() => {
   // // setAllTokenIds(tokenIds.toString());
   let getSoldItems = await lotteryContract.getSoldItems(collection.address);
   console.log(getSoldItems, "getSoldItems");
+  
     axios.get(collection.uri)
      .then((response) => {
      console.log(response,"response");
@@ -139,7 +162,9 @@ Explore Lottery Collections
 {console.log(img.tokenID, "img.tokenId")}
 {console.log(i.price, "i.price")}
 {console.log(i.address, "i.address")}
-            <button class="btn btn-outline-success mb-5" onClick={() => purchaseItem(img.tokenID, i.address, i.price)}>Buy for {i.price}</button>
+{console.log(price, "i.price")}
+
+            <button class="btn btn-outline-success mb-5" onClick={() => purchaseItem(img.tokenID, i.address)}>Buy for {i.price}</button>
             </>
 
           )
