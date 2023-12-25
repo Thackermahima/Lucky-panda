@@ -74,7 +74,7 @@ return LotteryEscrow(tokenAddress).requestRandomWords();
     uint256 tokenId,
     address tokenAddress
 ) public payable {
-    LotteryEscrow(tokenAddress).purchaseItem(tokenId, msg.sender);
+    LotteryEscrow(tokenAddress).purchaseItem{value: msg.value}(tokenId, msg.sender);
 }
    function getSoldItems(address tokenAddress) public view returns(uint256[] memory){
     return LotteryEscrow(tokenAddress).getAllSoldItems();

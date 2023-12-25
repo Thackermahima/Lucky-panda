@@ -222,7 +222,7 @@ function performUpkeep(bytes calldata /* performData */) external override {
     }
     function purchaseItem(uint256 tokenId, address to) external payable {
         uint256 _totalPrice = getTotalPrice(tokenId);
-        MarketItem memory item = marketItems[tokenId];
+        MarketItem storage item = marketItems[tokenId];
            require(
             msg.value >= _totalPrice,
             "not enough matic to cover item price and market fee"
@@ -231,10 +231,10 @@ function performUpkeep(bytes calldata /* performData */) external override {
         item.seller.transfer(item.price);
         feeAccount.transfer(_totalPrice - item.price);
         item.sold = true; 
-        IERC721(item.nftContract).transferFrom(item.seller, to, tokenId);
+        IERC721(item.nftContract).transferFrom(address(this), to, item.tokenId);
         marketItems[tokenId].owner = payable(to);
         allSoldItems.push(tokenId);
-        emit Bought(address(this), item.tokenId, item.price, item.seller, to);
+        emit Bought(address(item.nftContract), item.tokenId, item.price, item.seller, to);
     } 
 
     function getAllSoldItems() external view returns (uint256[] memory) {

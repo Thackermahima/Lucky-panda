@@ -54,32 +54,38 @@ async function purchaseItem(tokenID, address) {
   );
 
   // Fetch the total price from the contract
-  const totalPrice = await lotteryContract.getTotalPrice(address, tokenID);
 
-  // Convert the total price (BigNumber) to a string for the transaction
-  const totalPriceString = totalPrice.toString();
-
-  console.log(tokenID, address, totalPriceString, "callPurchaseArguments");
-  const valueToSend = ethers.parseUnits(totalPriceString, "wei");
-
+  
   try {
-    console.log("Sending transaction with value:", valueToSend.toString());
-    const addresss = await signer.getAddress();
-    const balance = await provider.getBalance(addresss);
-    console.log("Account balance:", ethers.formatEther(balance), "MATIC");
+    // Convert totalPrice to BigNumber correctly
+    const totalPrice = await lotteryContract.getTotalPrice(address, tokenID);
+    const totalPriceString = totalPrice.toString();
     
-    const purchaseItemTx = await lotteryContract.callPurchaseItem(tokenID, address, { value: valueToSend });
-    const txBuy = await purchaseItemTx.wait()
+    console.log(tokenID, address, totalPriceString, "callPurchaseArguments");
+  
+    // Fetch recommended gas price from an API or use a sensible default
+    const currentGasPrice = await provider.getGasPrice(); // or a fixed value in wei
 
-    if (txBuy) {
+    const purchaseItemTx = await lotteryContract.callPurchaseItem(tokenID, address, {
+      value: totalPriceString,
+      gasPrice: currentGasPrice, // Updated gas price
+      gasLimit: 500000, // Adjust as needed
+    });
+
+    const txReceipt = await purchaseItemTx.wait();
+
+    // Check if the transaction was successful
+    if (txReceipt && txReceipt.status === 1) {
       console.log("NFT purchased");
     } else {
-      console.log("failed");
+      console.log("Transaction failed or was dropped");
     }
   } catch (error) {
-    console.error("Transaction failed:", error.message);
+    console.error("Transaction submission failed:", error.message);
   }
+
 }
+
 
 useEffect(() => {
   getAllCollection();
