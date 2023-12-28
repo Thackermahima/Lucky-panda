@@ -4,13 +4,15 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
+
 import "./comman/ERC721.sol";
 
 contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterface{
     uint256 private _tokenIdCounter;
+        uint256 private _ItemIdsCounter;
+
      address payable public immutable feeAccount;
     uint256 public feePercent = 2; //the fee percntage on sales
-    mapping(uint256 => MarketItem) public marketItems;
     mapping(uint256 => address payable) public OwnerOfAnNFT;
     uint256[] public allSoldItems;
     address payable public winner;
@@ -36,6 +38,7 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
     uint256 public lastRequestId;
 
     struct MarketItem {
+        uint256 itemId;
         address nftContract;
         uint256 tokenId;
         address payable seller;
@@ -45,6 +48,7 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
     }
 
     event MarketItemCreated(
+        uint256 indexed itemId,
         address indexed nftContract,
         uint256 indexed tokenId,
         address seller,
@@ -58,6 +62,9 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
         address indexed seller,
         address indexed buyer
     );
+        mapping(uint256 => MarketItem) public marketItems;
+            address marketplaceAddress;
+
     //   bytes32 keyHash =
     //     0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c;
      event RandomnessRequestSent(uint256 requestId, uint32 numWords);
@@ -78,10 +85,12 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
         uint256 _winnerPercentage,
         address vrfCoordinator,
         bytes32 vrfKeyHash,
-        uint64 subscriptionId
+        uint64 subscriptionId,
+        address _marketplaceAddress
     ) ERC721(_name, _symbol) 
       VRFConsumerBaseV2(vrfCoordinator) 
     {
+        marketplaceAddress = _marketplaceAddress;
         feeAccount = payable(address(this));
         interval = updateInterval;
         lastTimeStamp = block.timestamp;
@@ -93,23 +102,40 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
    
 
 
-    function safeMint(address payable to, uint256 price) public returns (uint256) {
+    function safeMint (address payable to) public returns (uint256) {
         uint256 tokenId = _tokenIdCounter;
          require(OwnerOfAnNFT[tokenId] == address(0), "The tokenId is already taken");
-        // Store the owner of the tokenId or NFT
             OwnerOfAnNFT[tokenId] = to;
-           _safeMint(msg.sender, tokenId);
-            marketItems[tokenId] = MarketItem(
+           _safeMint(to, tokenId);        
+           setApprovalForAll(marketplaceAddress, true);       
+          _tokenIdCounter++;
+          return tokenId;
+    }
+       function createMarketItem(
+        uint256 tokenId,
+        uint256 price
+    ) public {
+        uint256 itemId = _ItemIdsCounter;
+            marketItems[itemId] = MarketItem(
+            itemId,
             address(this),
             tokenId,
-            payable(to),
+            payable(msg.sender),
             payable(address(0)),
             price,
             false
         );
-        _tokenIdCounter++;
-        emit MarketItemCreated(address(this), tokenId, to, address(0), price);
-        return tokenId;
+
+        IERC721(address(this)).transferFrom(msg.sender, address(this), tokenId);
+        _ItemIdsCounter++;
+        emit MarketItemCreated(
+            itemId,
+            address(this),
+            tokenId,
+            msg.sender,
+            address(0),
+            price
+        );
     }
          
          function requestRandomWords()
@@ -234,7 +260,7 @@ function performUpkeep(bytes calldata /* performData */) external override {
         IERC721(item.nftContract).transferFrom(address(this), to, item.tokenId);
         marketItems[tokenId].owner = payable(to);
         allSoldItems.push(tokenId);
-        emit Bought(address(item.nftContract), item.tokenId, item.price, item.seller, to);
+        emit Bought(address(this), item.tokenId, item.price, item.seller, to);
     } 
 
     function getAllSoldItems() external view returns (uint256[] memory) {

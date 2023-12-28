@@ -1,99 +1,6 @@
-export const LotteryEscrowParentContract = '0xAAEB20aD80ad21daC9F83B463c5d2Fe72B38e01e'; 
+export const LotteryEscrowParentContract = '0x0889597CaC2c19Ab68754C5dBeaf6c7FCAA52E5B'; 
 
 export const lotteryEscrowParentABI = [
-	{
-		"inputs": [
-			{
-				"internalType": "address payable",
-				"name": "tokenAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "start",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "end",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "price",
-				"type": "uint256"
-			}
-		],
-		"name": "bulkMintERC721",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "tokenAddress",
-				"type": "address"
-			}
-		],
-		"name": "callPurchaseItem",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "tokenAddress",
-				"type": "address"
-			}
-		],
-		"name": "callRequestRandomWords",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "symbol",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "updateInterval",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "winnerPercentage",
-				"type": "uint256"
-			}
-		],
-		"name": "createToken",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
 	{
 		"inputs": [
 			{
@@ -134,31 +41,6 @@ export const lotteryEscrowParentABI = [
 		],
 		"name": "OwnershipTransferred",
 		"type": "event"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "collectionContract",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "uri",
-				"type": "string"
-			}
-		],
-		"name": "setCollectionUri",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -213,47 +95,6 @@ export const lotteryEscrowParentABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address payable",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "token",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "transferToken",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
@@ -268,6 +109,112 @@ export const lotteryEscrowParentABI = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address payable",
+				"name": "tokenAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "start",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "end",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			}
+		],
+		"name": "bulkMintERC721",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address payable",
+				"name": "tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "callApproveToken",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address payable",
+				"name": "tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "callPurchaseItem",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address payable",
+				"name": "tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "callRequestRandomWords",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "symbol",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "updateInterval",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "winnerPercentage",
+				"type": "uint256"
+			}
+		],
+		"name": "createToken",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -369,7 +316,7 @@ export const lotteryEscrowParentABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "address",
+				"internalType": "address payable",
 				"name": "tokenAddress",
 				"type": "address"
 			}
@@ -388,7 +335,7 @@ export const lotteryEscrowParentABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "address",
+				"internalType": "address payable",
 				"name": "tokenAddress",
 				"type": "address"
 			},
@@ -412,7 +359,7 @@ export const lotteryEscrowParentABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "address",
+				"internalType": "address payable",
 				"name": "tokenAddress",
 				"type": "address"
 			}
@@ -473,6 +420,72 @@ export const lotteryEscrowParentABI = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "collectionContract",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "uri",
+				"type": "string"
+			}
+		],
+		"name": "setCollectionUri",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address payable",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "address payable",
+				"name": "token",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "transferToken",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]

@@ -52,38 +52,46 @@ async function purchaseItem(tokenID, address) {
     lotteryEscrowParentABI,
     signer
   );
-
   // Fetch the total price from the contract
-
-  
   try {
     // Convert totalPrice to BigNumber correctly
     const totalPrice = await lotteryContract.getTotalPrice(address, tokenID);
+    console.log(totalPrice,"totalPrice");
     const totalPriceString = totalPrice.toString();
-    
-    console.log(tokenID, address, totalPriceString, "callPurchaseArguments");
-  
-    // Fetch recommended gas price from an API or use a sensible default
-    const currentGasPrice = await provider.getGasPrice(); // or a fixed value in wei
+    console.log(tokenID, address, totalPrice, "callPurchaseArguments");
+    console.log(totalPrice,"value");
+    console.log(totalPriceString, "totalPriceString");  
+    const feeData = await provider.getFeeData();
 
+    // Access the relevant values:
+    const gasPrice = feeData.gasPrice; // For legacy transaction
+
+    // Format the gas price in gwei (optional):
+    const gasPriceInGwei = ethers.formatUnits(gasPrice, 'gwei');
+
+    console.log("Gas price in gwei:", gasPriceInGwei);
+   console.log("GasPrice", gasPrice);
     const purchaseItemTx = await lotteryContract.callPurchaseItem(tokenID, address, {
-      value: totalPriceString,
-      gasPrice: currentGasPrice, // Updated gas price
-      gasLimit: 500000, // Adjust as needed
+      value: totalPrice,
+      // gasPrice: gasPrice, // Can set this >= to the number read from Ganache window
+		  // gasLimit: 6721975
     });
 
     const txReceipt = await purchaseItemTx.wait();
-
-    // Check if the transaction was successful
+    console.log(txReceipt, "txReceipt");
     if (txReceipt && txReceipt.status === 1) {
       console.log("NFT purchased");
     } else {
       console.log("Transaction failed or was dropped");
     }
   } catch (error) {
-    console.error("Transaction submission failed:", error.message);
+    console.error("Transaction submission failed:", error);
+    console.log("Error code:", error.code);
+    console.log("Error data:", error.data);
+    if (error.transaction) {
+      console.log("Transaction data:", error.transaction);
+    }
   }
-
 }
 
 

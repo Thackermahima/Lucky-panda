@@ -14,7 +14,7 @@
     "@mui/material": "^5.14.19",
     "axios": "^1.6.2",
     "dotenv": "^16.3.1",
-    "ethers": "^6.4.0",
+    "ethers": "^6.3.0",
     "firebase": "^10.7.0",
     "ipfs-http-client": "^60.0.1",
     "net": "^1.0.2",
@@ -35,9 +35,9 @@
   },
   "browser": {
     "fs": false,
-    "path": false, 
-    "os": false, 
-    "net": false, 
+    "path": false,
+    "os": false,
+    "net": false,
     "tls": false
   }
 }

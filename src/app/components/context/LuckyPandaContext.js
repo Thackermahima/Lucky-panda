@@ -151,7 +151,7 @@ if (txc.status === 1) {
         if (txb) {
           console.log("Tokens minted successfully!");
         }
-    
+      
         let tokenIds = await lotteryContract.getAllTokenId(tokenContractAddress);
         var imgTokenUrl = await Promise.all(
           tokenIds.map(async (tokenId) => {
@@ -187,7 +187,7 @@ if (txc.status === 1) {
         console.log(uri, "last uri");
     
         notify();
-    
+       
         const setCollectionOfUri = await lotteryContract.setCollectionUri(
           tokenContractAddress,
           uri

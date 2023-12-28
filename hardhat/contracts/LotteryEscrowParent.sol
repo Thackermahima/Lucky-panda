@@ -17,7 +17,7 @@ import "./LotteryEscrow.sol";
         bytes32 vrfKeyHash = 0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c;
         uint64 subscriptionId = 7485;
     function createToken(string memory name, string memory symbol, uint256 updateInterval, uint256 winnerPercentage) public {
-       address _address = address(new LotteryEscrow(name, symbol, updateInterval,winnerPercentage, vrfCoordinator, vrfKeyHash, subscriptionId));
+       address _address = address(new LotteryEscrow(name, symbol, updateInterval,winnerPercentage, vrfCoordinator, vrfKeyHash, subscriptionId, address(this)));
        uint256 count = 0;
        tokens[msg.sender].push(_address);
        CollectionAddresses.push(_address);
@@ -33,21 +33,24 @@ import "./LotteryEscrow.sol";
     function getCollectionTokenId(address collectionContract) public view returns(uint256){
         return collectionsOfTokenId[collectionContract];
     }
-    function bulkMintERC721(
-        address payable tokenAddress,
-        uint256 start,
-        uint256 end,
-        uint256 price
-    ) public {
-         uint256 count = 0;
-        for (uint256 i = start; i < end; i++) {
-         uint256 tokenId =  LotteryEscrow(tokenAddress).safeMint(payable(msg.sender), price);
+function bulkMintERC721(
+    address tokenAddress,
+    uint256 start,
+    uint256 end,
+    uint256 price
+) public {
+    uint256 count = 0;
+    for (uint256 i = start; i < end; i++) {
+        // Mint the NFT
+        uint256 tokenId = LotteryEscrow(tokenAddress).safeMint(payable(msg.sender));
         contractTokenIds[tokenAddress].push(tokenId);
         collectionsOfTokenId[tokenAddress] = tokenId;
-                          count++;             
-            }         
-        getNFTCount = count;
-   } 
+       LotteryEscrow(tokenAddress).createMarketItem(tokenId, price);
+        count++;
+    }
+    getNFTCount = count;
+}
+
 
    function getAllContractAddresses() public view returns(address[] memory) {
    return CollectionAddresses;
@@ -74,7 +77,8 @@ return LotteryEscrow(tokenAddress).requestRandomWords();
     uint256 tokenId,
     address tokenAddress
 ) public payable {
-    LotteryEscrow(tokenAddress).purchaseItem{value: msg.value}(tokenId, msg.sender);
+LotteryEscrow(tokenAddress).purchaseItem{value: msg.value}(tokenId, msg.sender);
+
 }
    function getSoldItems(address tokenAddress) public view returns(uint256[] memory){
     return LotteryEscrow(tokenAddress).getAllSoldItems();
