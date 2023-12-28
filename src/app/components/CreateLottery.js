@@ -104,7 +104,7 @@ const CreateLottery = () => {
                 value={tokenPrice}
                 onChange={tokenPriceEvent}
 />
-            </FormControl>
+            {/* </FormControl>
             <InputLabel htmlFor="image">Upload Image</InputLabel>
             <FormControl fullWidth margin="normal" variant="outlined">
               <TextField
@@ -148,7 +148,7 @@ const CreateLottery = () => {
                 <MenuItem value={5}>5 minutes</MenuItem>
                 <MenuItem value={10}>10 minutes</MenuItem>
                 <MenuItem value={15}>15 minutes</MenuItem>
-              </Select>
+              </Select> */}
             </FormControl>
 
             <Button type="submit" variant="contained" sx={{ backgroundColor: "#D82148", textTransform: 'capitalize', border: '2px solid #D82148', fontWeight: 'bold', marginTop: '25px', margin: 'auto',  // Center horizontally

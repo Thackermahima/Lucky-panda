@@ -2,9 +2,8 @@ import React, { createContext, useState } from "react";
 import { create } from "ipfs-http-client";
 import { toast } from "react-toastify";
 import {
-  LotteryEscrowParentContract,
-  lotteryEscrowParentABI,
-  lotteryEscrowABI
+  MarketplaceContractAddress,
+  MarketplaceContractABI,
 } from '../../constants/abi';
 const ethers = require("ethers") 
 
@@ -94,29 +93,29 @@ export const LuckyPandaContextProvider = (props) => {
         const signer = await provider.getSigner();
         console.log(signer.getChainId, "getChainId");
         const lotteryContract = new ethers.Contract(
-          LotteryEscrowParentContract,
-          lotteryEscrowParentABI,
+          MarketplaceContractAddress,
+          MarketplaceContractABI,
           signer
         );
-        console.log(lotteryContract, "lotteryContract");
-    console.log(name, symbol);
-    console.log(winnerPercentage,"winnerPercentage");
-    const winnerPercentageValue = parseInt(winnerPercentage, 10)
-    console.log(winnerPercentageValue, "winnerPercentageValue");
-    const resultTimeValue = resultTime * 60;
-    console.log(resultTimeValue, "result time");
-    const proxyBooksObj = new Proxy(lotteryContract, {
-      get: (target, key) => {
-        console.log(`Fetching book ${key} by ${target[key]}`);
-        return target[key];
-      }
-    })
-    console.log(proxyBooksObj,"proxyBooksObj");
+    //     console.log(lotteryContract, "lotteryContract");
+    // console.log(name, symbol);
+    // console.log(winnerPercentage,"winnerPercentage");
+    // const winnerPercentageValue = parseInt(winnerPercentage, 10)
+    // console.log(winnerPercentageValue, "winnerPercentageValue");
+    // const resultTimeValue = resultTime * 60;
+    // console.log(resultTimeValue, "result time");
+    // const proxyBooksObj = new Proxy(lotteryContract, {
+    //   get: (target, key) => {
+    //     console.log(`Fetching book ${key} by ${target[key]}`);
+    //     return target[key];
+    //   }
+    // })
+    // console.log(proxyBooksObj,"proxyBooksObj");
         let transactionCreate = await lotteryContract.createToken(
           name,
           symbol,
-          resultTime * 60,
-          winnerPercentage    
+          // resultTime * 60,
+          // winnerPercentage    
               );  
         let txc = await transactionCreate.wait();
         let tokenContractAddress;
@@ -145,57 +144,67 @@ if (txc.status === 1) {
           tokenContractAddress,
           0,
           tokenQuantity,
-          ethers.parseUnits(tokenPrice.toString(), "ether")
+          // ethers.parseUnits(tokenPrice.toString(), "ether")
         );
         let txb = await transactionBulkMint.wait();
         if (txb) {
           console.log("Tokens minted successfully!");
         }
-      
-        let tokenIds = await lotteryContract.getAllTokenId(tokenContractAddress);
-        var imgTokenUrl = await Promise.all(
-          tokenIds.map(async (tokenId) => {
-            // const imageBuffer = await uploadImg.arrayBuffer();
-            console.log(uploadImg,"uploadImg");
-            const ipfsHash = await addDataToIPFS(uploadImg);
-            console.log(ipfsHash,"ipfsHash");
-            const imageUrl = {
-              url: `https://superfun.infura-ipfs.io/ipfs/${ipfsHash}`,
-              tokenID: tokenId.toString(),
-            };
-            console.log(imageUrl,"imageUrl");
-            return imageUrl;
-          })
-        );
-    
-        const blob = new Blob(
-          [
-            JSON.stringify({
-              name,
-              symbol,
-              tokenPrice,
-              tokenQuantity,
-              imgTokenUrl,
-              resultTime,
-            }),
-          ],
-          { type: "application/json" }
-        );
-        const files = [new File([blob], "data.json")];
-        const path = await addDataToIPFS(files[0]);
-        const uri = `https://superfun.infura-ipfs.io/ipfs/${path}`;
-        console.log(uri, "last uri");
-    
-        notify();
-       
-        const setCollectionOfUri = await lotteryContract.setCollectionUri(
+        let transactionCreateItem = await lotteryContract.createMarketItem(
           tokenContractAddress,
-          uri
+          0,
+          ethers.parseUnits(tokenPrice.toString(), "ether"),
+          // ethers.parseUnits(tokenPrice.toString(), "ether")
         );
-        let txs = await setCollectionOfUri.wait();
-        if (txs) {
-          console.log(setCollectionOfUri, "setCollectionOfUris");
+        let txI = await transactionCreateItem.wait();
+        if (txI) {
+          console.log("Tokens listed Successfully!");
         }
+      
+        // let tokenIds = await lotteryContract.getAllTokenId(tokenContractAddress);
+        // var imgTokenUrl = await Promise.all(
+        //   tokenIds.map(async (tokenId) => {
+        //     // const imageBuffer = await uploadImg.arrayBuffer();
+        //     console.log(uploadImg,"uploadImg");
+        //     const ipfsHash = await addDataToIPFS(uploadImg);
+        //     console.log(ipfsHash,"ipfsHash");
+        //     const imageUrl = {
+        //       url: `https://superfun.infura-ipfs.io/ipfs/${ipfsHash}`,
+        //       tokenID: tokenId.toString(),
+        //     };
+        //     console.log(imageUrl,"imageUrl");
+        //     return imageUrl;
+        //   })
+        // );
+    
+        // const blob = new Blob(
+        //   [
+        //     JSON.stringify({
+        //       name,
+        //       symbol,
+        //       tokenPrice,
+        //       tokenQuantity,
+        //       imgTokenUrl,
+        //       resultTime,
+        //     }),
+        //   ],
+        //   { type: "application/json" }
+        // );
+        // const files = [new File([blob], "data.json")];
+        // const path = await addDataToIPFS(files[0]);
+        // const uri = `https://superfun.infura-ipfs.io/ipfs/${path}`;
+        // console.log(uri, "last uri");
+    
+        // notify();
+       
+        // const setCollectionOfUri = await lotteryContract.setCollectionUri(
+        //   tokenContractAddress,
+        //   uri
+        // );
+        // let txs = await setCollectionOfUri.wait();
+        // if (txs) {
+        //   console.log(setCollectionOfUri, "setCollectionOfUris");
+        // }
 
       
         // const callRequestRandomWords = await lotteryContract.callRequestRandomWords(

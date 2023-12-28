@@ -41,7 +41,6 @@ function bulkMintERC721(
 ) public {
     uint256 count = 0;
     for (uint256 i = start; i < end; i++) {
-        // Mint the NFT
         uint256 tokenId = LotteryEscrow(tokenAddress).safeMint(payable(msg.sender));
         contractTokenIds[tokenAddress].push(tokenId);
         collectionsOfTokenId[tokenAddress] = tokenId;

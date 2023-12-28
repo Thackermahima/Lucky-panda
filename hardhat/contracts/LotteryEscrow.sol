@@ -4,8 +4,8 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-import "./comman/ERC721.sol";
 
 contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterface{
     uint256 private _tokenIdCounter;
@@ -56,6 +56,7 @@ contract LotteryEscrow is ERC721, VRFConsumerBaseV2, AutomationCompatibleInterfa
         uint256 price
     );
     event Bought(
+        uint256 itemId,
         address indexed nft,
         uint256 tokenId,
         uint256 price,
@@ -260,7 +261,7 @@ function performUpkeep(bytes calldata /* performData */) external override {
         IERC721(item.nftContract).transferFrom(address(this), to, item.tokenId);
         marketItems[tokenId].owner = payable(to);
         allSoldItems.push(tokenId);
-        emit Bought(address(this), item.tokenId, item.price, item.seller, to);
+        emit Bought(item.itemId, address(this), item.tokenId, item.price, item.seller, to);
     } 
 
     function getAllSoldItems() external view returns (uint256[] memory) {
