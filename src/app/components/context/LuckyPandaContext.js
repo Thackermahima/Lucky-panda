@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import {
   MarketplaceContractAddress,
   MarketplaceContractABI,
+  NFTContractABI
 } from '../../constants/abi';
 const ethers = require("ethers") 
 
@@ -97,6 +98,8 @@ export const LuckyPandaContextProvider = (props) => {
           MarketplaceContractABI,
           signer
         );
+       
+
     //     console.log(lotteryContract, "lotteryContract");
     // console.log(name, symbol);
     // console.log(winnerPercentage,"winnerPercentage");
@@ -104,13 +107,7 @@ export const LuckyPandaContextProvider = (props) => {
     // console.log(winnerPercentageValue, "winnerPercentageValue");
     // const resultTimeValue = resultTime * 60;
     // console.log(resultTimeValue, "result time");
-    // const proxyBooksObj = new Proxy(lotteryContract, {
-    //   get: (target, key) => {
-    //     console.log(`Fetching book ${key} by ${target[key]}`);
-    //     return target[key];
-    //   }
-    // })
-    // console.log(proxyBooksObj,"proxyBooksObj");
+   
         let transactionCreate = await lotteryContract.createToken(
           name,
           symbol,
@@ -144,67 +141,79 @@ if (txc.status === 1) {
           tokenContractAddress,
           0,
           tokenQuantity,
-          // ethers.parseUnits(tokenPrice.toString(), "ether")
         );
         let txb = await transactionBulkMint.wait();
         if (txb) {
           console.log("Tokens minted successfully!");
         }
-        let transactionCreateItem = await lotteryContract.createMarketItem(
+        const nftContract  = new ethers.Contract(
           tokenContractAddress,
-          0,
-          ethers.parseUnits(tokenPrice.toString(), "ether"),
-          // ethers.parseUnits(tokenPrice.toString(), "ether")
+          NFTContractABI,
+          signer
         );
-        let txI = await transactionCreateItem.wait();
-        if (txI) {
-          console.log("Tokens listed Successfully!");
-        }
-      
-        // let tokenIds = await lotteryContract.getAllTokenId(tokenContractAddress);
-        // var imgTokenUrl = await Promise.all(
-        //   tokenIds.map(async (tokenId) => {
-        //     // const imageBuffer = await uploadImg.arrayBuffer();
-        //     console.log(uploadImg,"uploadImg");
-        //     const ipfsHash = await addDataToIPFS(uploadImg);
-        //     console.log(ipfsHash,"ipfsHash");
-        //     const imageUrl = {
-        //       url: `https://superfun.infura-ipfs.io/ipfs/${ipfsHash}`,
-        //       tokenID: tokenId.toString(),
-        //     };
-        //     console.log(imageUrl,"imageUrl");
-        //     return imageUrl;
-        //   })
-        // );
-    
-        // const blob = new Blob(
-        //   [
-        //     JSON.stringify({
-        //       name,
-        //       symbol,
-        //       tokenPrice,
-        //       tokenQuantity,
-        //       imgTokenUrl,
-        //       resultTime,
-        //     }),
-        //   ],
-        //   { type: "application/json" }
-        // );
-        // const files = [new File([blob], "data.json")];
-        // const path = await addDataToIPFS(files[0]);
-        // const uri = `https://superfun.infura-ipfs.io/ipfs/${path}`;
-        // console.log(uri, "last uri");
-    
-        // notify();
+        console.log(nftContract, "NFTContract");
        
-        // const setCollectionOfUri = await lotteryContract.setCollectionUri(
-        //   tokenContractAddress,
-        //   uri
-        // );
-        // let txs = await setCollectionOfUri.wait();
-        // if (txs) {
-        //   console.log(setCollectionOfUri, "setCollectionOfUris");
-        // }
+         
+          let approvalNFT = await nftContract.setApprovalForAll(MarketplaceContractAddress, true);    
+          let txApprovalNFT = await approvalNFT.wait();
+          if (txApprovalNFT) {
+            console.log("Token Transfer Approved!");
+          }
+          console.log(tokenContractAddress,tokenQuantity,ethers.parseUnits(tokenPrice.toString(), "ether"), "tokenQuantity after approval");
+          let transactionCreateItem = await lotteryContract.createMarketItem(
+            tokenContractAddress,
+            0,
+            tokenQuantity,
+            ethers.parseUnits(tokenPrice.toString(), "ether"),
+          );
+          let txI = await transactionCreateItem.wait();
+          if (txI) {
+            console.log("Tokens listed Successfully!");
+          }
+        
+        let tokenIds = await lotteryContract.getAllTokenId(tokenContractAddress);
+        var imgTokenUrl = await Promise.all(
+          tokenIds.map(async (tokenId) => {
+            console.log(uploadImg,"uploadImg");
+            const ipfsHash = await addDataToIPFS(uploadImg);
+            console.log(ipfsHash,"ipfsHash");
+            const imageUrl = {
+              url: `https://superfun.infura-ipfs.io/ipfs/${ipfsHash}`,
+              tokenID: tokenId.toString(),
+            };
+            console.log(imageUrl,"imageUrl");
+            return imageUrl;
+          })
+        );
+    
+        const blob = new Blob(
+          [
+            JSON.stringify({
+              name,
+              symbol,
+              tokenPrice,
+              tokenQuantity,
+              imgTokenUrl,
+              resultTime,
+            }),
+          ],
+          { type: "application/json" }
+        );
+        const files = [new File([blob], "data.json")];
+        const path = await addDataToIPFS(files[0]);
+        const uri = `https://superfun.infura-ipfs.io/ipfs/${path}`;
+        console.log(uri, "last uri");
+    
+        notify();
+       
+        const setCollectionOfUri = await lotteryContract.setCollectionUri(
+          tokenContractAddress,
+          uri
+        );
+        let txs = await setCollectionOfUri.wait();
+        if (txs) {
+          console.log(setCollectionOfUri, "setCollectionOfUris");
+        }
 
       
         // const callRequestRandomWords = await lotteryContract.callRequestRandomWords(
@@ -224,7 +233,6 @@ if (txc.status === 1) {
       } catch (error) {
         console.error("Error submitting form:", error);
       } finally {
-        // Clear form values after completing the form submission
         setName("");
         setTokenPrice("");
         setTokenQuantity("");
