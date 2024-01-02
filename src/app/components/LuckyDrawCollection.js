@@ -1,6 +1,8 @@
 import React,{useState, useEffect} from "react";
 import { Card, CardContent, CardActions, Box, Button, Typography } from '@mui/material';
 import { MarketplaceContractAddress, MarketplaceContractABI } from "../constants/abi";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
 const ethers = require("ethers");
 
@@ -13,6 +15,7 @@ const LuckyDrawCollection = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [price, setPrice] = useState('');
+
   async function getAllCollection(){
   let getCollectionOfUri;
   const accounts = await window.ethereum.request({
@@ -53,7 +56,7 @@ async function purchaseItem(address, tokenID) {
     signer
   );
   try {
-    const totalPrice = await MarketpaceContract.getTotalPrice(tokenID);
+    const totalPrice = await MarketpaceContract.getTotalPrice(address, tokenID);
     console.log(tokenID, address, totalPrice, "callPurchaseArguments");
     console.log(totalPrice,"value");
     const purchaseItemTx = await MarketpaceContract.purchaseItem(address, tokenID, {
@@ -64,7 +67,16 @@ async function purchaseItem(address, tokenID) {
     console.log(txReceipt, "txReceipt");
     if (txReceipt && txReceipt.status === 1) {
       console.log("NFT purchased");
-    } else {
+      toast.success("🚀 NFT Purchased! Welcome to the world of digital art.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+    });
+} else {
       console.log("Transaction failed or was dropped");
     }
   } catch (error) {
@@ -86,18 +98,10 @@ useEffect(() => {
   console.log(collectionUris,"collectionUris")
   let images = [];
 
-   collectionUris.map(async(collection) => {
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
-    const MarketpaceContract = new ethers.Contract(
-      MarketplaceContractAddress,
-      MarketplaceContractABI,
-      signer
-    );
+   collectionUris.map(async(collection) => {      
   // // let tokenIds = await MarketpaceContract.getAllTokenId(collection.address);
   // // setAllTokenIds(tokenIds.toString());
-//   let getSoldItems = await MarketpaceContract.getSoldItems();
-//   console.log(getSoldItems, "getSoldItems");
+
   
     axios.get(collection.uri)
      .then((response) => {
@@ -125,7 +129,6 @@ useEffect(() => {
     })
     })
 },[collectionUris])
-
 
     return (
         <Box

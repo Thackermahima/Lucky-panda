@@ -7,16 +7,13 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 contract NFT is ERC721{
         uint256 private _tokenIdCounter;
         address marketlaceAddress;
-      constructor(string memory _name, string memory _symbol, address _marketplaceAddress)
+      constructor(string memory _name, string memory _symbol)
         ERC721(_name, _symbol)
-    {
-        marketlaceAddress = _marketplaceAddress;
-    }
+    {}
     
    function safeMint (address to) public returns (uint256) {
         uint256 tokenId = _tokenIdCounter;
            _safeMint(to, tokenId);    
-            setApprovalForAll(marketlaceAddress, true);
           _tokenIdCounter++;
           return tokenId;
     }

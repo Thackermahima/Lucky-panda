@@ -11,16 +11,16 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard{
 
     mapping (address => address[]) private tokens;
     mapping (address => uint256[] ) contractTokenIds;
-    mapping (address => uint256) collectionsOfTokenId;
-    mapping (uint256 => MarketItem) public marketItems;
+    mapping (address => uint256[]) contractItemIds;  // Added mapping for contract to itemIds
+    mapping (address => uint256[]) collectionsOfSoldItems;
+    mapping (address => mapping(uint256 => MarketItem)) public marketItems;  // Updated mapping for collection to MarketItem
     mapping (address => string) collections;
 
     address payable public feeAccount =  payable(address(this));
     address[] public CollectionAddresses;
     uint256 public feePercent = 2;
     uint public getNFTCount; 
-    uint256 private _ItemIdsCounter;
-    uint256[] public allSoldItems;
+    uint256 private _ItemIdsCounter;    
 
     event TokenCreated(address, address);
 
@@ -53,7 +53,7 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard{
     );
 
     function createToken(string memory name, string memory symbol) public {
-       address _address = address(new NFT(name, symbol, address(this)));   
+       address _address = address(new NFT(name, symbol));   
         uint256 count = 0;
        tokens[msg.sender].push(_address);
        CollectionAddresses.push(_address);
@@ -70,7 +70,6 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard{
     for (uint256 i = start; i < end; i++) {
         uint256 tokenId = NFT(tokenAddress).safeMint(msg.sender);
         contractTokenIds[tokenAddress].push(tokenId);
-        collectionsOfTokenId[tokenAddress] = tokenId;
         count++;
     }
     getNFTCount = count;
@@ -83,24 +82,23 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard{
 ) public nonReentrant {
     for (uint256 i = start; i < end; i++) {
         uint256 tokenId = contractTokenIds[nftContractAddress][i];
-        uint256 itemId = _ItemIdsCounter;
-        marketItems[itemId] = MarketItem(
-            itemId,
-            nftContractAddress,
-            tokenId,
-            payable(msg.sender),
-            payable(address(0)),
-            price,
-            false
-        );
-        _ItemIdsCounter++;
+        uint256 itemId = i;  
+        marketItems[nftContractAddress][itemId] = MarketItem(
+                itemId,
+                nftContractAddress,
+                tokenId,
+                payable(msg.sender),
+                payable(address(0)),
+                price,
+                false
+            );
 
         IERC721(nftContractAddress).transferFrom(
             msg.sender,
             address(this),
             tokenId
         );
-
+        contractItemIds[nftContractAddress].push(itemId);
         emit MarketItemCreated(
             itemId,
             nftContractAddress,
@@ -113,8 +111,8 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard{
 }
 
   function purchaseItem(address nftContract, uint256 tokenId) external payable nonReentrant {
-    uint256 _totalPrice = getTotalPrice(tokenId);
-    MarketItem storage item = marketItems[tokenId];
+    uint256 _totalPrice = getTotalPrice(nftContract, tokenId);
+        MarketItem storage item = marketItems[nftContract][tokenId];
 
     require(msg.value >= _totalPrice, "not enough ether to cover item price and market fee");
     require(!item.sold, "item already sold");
@@ -135,8 +133,8 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard{
     );
     require(successTransfer, "NFT transfer failed");
 
-    marketItems[tokenId].owner = payable(msg.sender);
-    allSoldItems.push(tokenId);
+    marketItems[nftContract][tokenId].owner = payable(msg.sender);
+    collectionsOfSoldItems[nftContract].push(tokenId);
     emit Bought(item.itemId, nftContract, item.tokenId, item.price, item.seller, msg.sender);
 }
 
@@ -155,21 +153,17 @@ function getAllTokenId(address tokenContractAddress) public view returns (uint[]
     } 
     return ret;
 }
-
-  function getCollectionTokenId(address collectionContract) public view returns(uint256){
-        return collectionsOfTokenId[collectionContract];
-    }
   
   function getAllContractAddresses() public view returns(address[] memory) {
    return CollectionAddresses;
   }
   
-  function getAllSoldItems() external view returns (uint256[] memory) {
-        return allSoldItems;
+  function getAllSoldItems(address nftContract) external view returns (uint256[] memory) {
+        return collectionsOfSoldItems[nftContract];
     }
 
-  function getTotalPrice(uint256 tokenId) public view returns (uint256) {
-        return ((marketItems[tokenId].price * (100 + feePercent)) / 100);
+  function getTotalPrice(address nftContract, uint256 tokenId) public view returns (uint256) {
+        return ((marketItems[nftContract][tokenId].price * (100 + feePercent)) / 100);
     }
   function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
