@@ -111,9 +111,10 @@ export const LuckyPandaContextProvider = (props) => {
         let transactionCreate = await lotteryContract.createToken(
           name,
           symbol,
-          // resultTime * 60,
-          // winnerPercentage    
+          resultTime * 60,
+          winnerPercentage    
               );  
+        console.log(transactionCreate, "transactionCreate");
         let txc = await transactionCreate.wait();
         let tokenContractAddress;
 if (txc.status === 1) {
@@ -214,16 +215,23 @@ if (txc.status === 1) {
         if (txs) {
           console.log(setCollectionOfUri, "setCollectionOfUris");
         }
-
+let requestId;
       
-        // const callRequestRandomWords = await lotteryContract.callRequestRandomWords(
-        //   tokenContractAddress
-        // );
-        // let txrw = await callRequestRandomWords.wait();
-        // if(txrw){
-        //   console.log(callRequestRandomWords, "callRequestRandomWords");
-        // }
+        const callRequestRandomWords = await lotteryContract.callRequestRandomWords(
+          tokenContractAddress
+        );
+        let txrw = await callRequestRandomWords.wait();
+        if (txrw.logs && txrw.logs.length > 0) {
+          const logs = txrw.logs;
+          console.log(logs, "logs");
+           requestId = logs[0].args[1];     
+                console.log(requestId, "callRequestRandomWords");
+        }
 
+        const getRequestStatus = await lotteryContract.getRequestStatus(
+          requestId
+        );
+        console.log(getRequestStatus, "getRequestStatus");
         // const getWinner = await lotteryContract.getWinner(tokenContractAddress);
         // let txwinner = await getWinner.wait();
         // if(txwinner){
