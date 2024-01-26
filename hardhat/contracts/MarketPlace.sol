@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
 
 import './NFT.sol';
-    import './ChainlinkVRF.sol';
+import './ChainlinkVRF.sol';
 
 contract Marketplace is Ownable(msg.sender), ReentrancyGuard, AutomationCompatible{ 
 
@@ -18,6 +18,7 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard, AutomationCompatib
     mapping (address => mapping(uint256 => MarketItem)) public marketItems;  // Updated mapping for collection to MarketItem
     mapping (address => string) collections;
     mapping(address => uint256) private lotteryRequestIds;
+    mapping(address => address) public collectionWinners;
 
     address payable public feeAccount =  payable(address(this));
     address[] public CollectionAddresses;
@@ -171,10 +172,17 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard, AutomationCompatib
 }
 function callRequestRandomWords(address tokenAddress) public returns(uint256) {
     uint256 nftCount = contractTokenIds[tokenAddress].length;
-    uint256 requestId = vrfContract.requestRandomWords(nftCount);
+    uint256 requestId = vrfContract.requestRandomWords(nftCount, tokenAddress);
     lotteryRequestIds[tokenAddress] = requestId;
     return requestId;
 }
+ function getRequestIdForCollection(address collectionAddress)
+        public
+        view
+        returns (uint256)
+    {
+        return vrfContract.getRequestIdForCollection(collectionAddress);
+    }
 
 function getRequestStatus(uint256 _requestId) public view returns(bool, uint256){
        return vrfContract.getRequestStatus(_requestId);
@@ -240,16 +248,18 @@ function playLottery(address collectionAddress, uint256 requestId) public {
     info.lastTimeStamp = block.timestamp;
     info.allSold = false;
 }
-function getWinnerAddress(address collectionAddress, uint256 winnerTokenId) internal view returns (address) {
-    uint256[] memory soldItems = collectionsOfSoldItems[collectionAddress];
-    require(winnerTokenId < soldItems.length, "Invalid winner tokenId");
+  function getWinnerAddress(address collectionAddress, uint256 winnerTokenId) internal view returns (address) {
+        uint256[] memory soldItems = collectionsOfSoldItems[collectionAddress];
+        require(winnerTokenId < soldItems.length, "Invalid winner tokenId");
 
-    uint256 winnerTokenIdFromSoldItems = soldItems[winnerTokenId];
-    MarketItem storage winningItem = marketItems[collectionAddress][winnerTokenIdFromSoldItems];
+        uint256 winnerTokenIdFromSoldItems = soldItems[winnerTokenId];
+        MarketItem storage winningItem = marketItems[collectionAddress][winnerTokenIdFromSoldItems];
 
-    return winningItem.owner;
-}
-
+        return winningItem.owner;
+    }
+function getCollectionWinner(address collectionAddress) external view returns (address) {
+        return collectionWinners[collectionAddress];
+    }
 function checkUpkeep(bytes calldata checkData)
     external
     override

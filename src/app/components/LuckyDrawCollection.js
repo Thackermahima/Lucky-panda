@@ -15,6 +15,7 @@ const LuckyDrawCollection = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [price, setPrice] = useState('');
+  const [soldItems, setSoldItems] = useState([]);
 
   async function getAllCollection(){
   let getCollectionOfUri;
@@ -36,16 +37,21 @@ const LuckyDrawCollection = () => {
   const collectionuris = await Promise.all(
     allContractAddresses.map(async(addrs) => {
       const uri = await MarketpaceContract.getCollectionUri(addrs);
+      const soldItems = await MarketpaceContract.getAllSoldItems(addrs);
+
       // const tokenId = await MarketpaceContract.getAllTokenId(addrs);
       // console.log(tokenId, "tokenIds");
       console.log(addrs, "addrs from collectionuris");
       console.log(uri, "uri from collectionuris");
-      return {address: addrs, uri: uri};
+      return {address: addrs, uri: uri, soldItems: soldItems};
     })
 
     );
   setCollectionUris(collectionuris);
+  setSoldItems(soldItems);
+
 }
+
 
 async function purchaseItem(address, tokenID) {
   const provider = new ethers.BrowserProvider(window.ethereum);
@@ -114,6 +120,7 @@ useEffect(() => {
       //   obj.tokenIds =  id.toString();
       
       //  })
+      
       obj.images = [];
       console.log(response.data.imgTokenUrl,"imgTokenUrl");
       response.data.imgTokenUrl.map((uri) => {
@@ -130,6 +137,19 @@ useEffect(() => {
     })
 },[collectionUris])
 
+useEffect(() => {
+  Img.map(async(i) => {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const MarketpaceContract = new ethers.Contract(
+      MarketplaceContractAddress,
+      MarketplaceContractABI,
+      signer
+    );
+    const getWinner = await MarketpaceContract.getCollectionWinner(i.address);
+    console.log(getWinner,"getWinner");
+  }) 
+},[])
     return (
         <Box
        sx={{

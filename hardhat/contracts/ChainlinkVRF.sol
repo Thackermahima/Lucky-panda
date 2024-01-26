@@ -26,6 +26,7 @@ contract ChainlinkVRF is  VRFConsumerBaseV2{
     }
     mapping(uint256 => RequestStatus)
         public s_requests; /* requestId --> requestStatus */
+    mapping(address => uint256) public collectionToRequestId;
 
     mapping(address => uint256) public addressToRequestId;
      // past requests Id.
@@ -55,7 +56,7 @@ contract ChainlinkVRF is  VRFConsumerBaseV2{
     }
 
 
-    function requestRandomWords(uint256 nftCount)
+    function requestRandomWords(uint256 nftCount, address tokenAddress)
         external 
         returns (uint256 requestId)
     {
@@ -75,8 +76,16 @@ contract ChainlinkVRF is  VRFConsumerBaseV2{
         s_randomTokenCount = nftCount;
         requestIds.push(requestId);
         lastRequestId = requestId;
+        collectionToRequestId[tokenAddress] = requestId;
         emit RequestSent(requestId, numWords);
         return requestId;
+    }
+    function getRequestIdForCollection(address collectionAddress)
+        external
+        view
+        returns (uint256)
+    {
+        return collectionToRequestId[collectionAddress];
     }
    
   function fulfillRandomWords(

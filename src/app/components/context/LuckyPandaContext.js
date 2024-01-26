@@ -4,7 +4,9 @@ import { toast } from "react-toastify";
 import {
   MarketplaceContractAddress,
   MarketplaceContractABI,
-  NFTContractABI
+  NFTContractABI,
+  ChainlinkVRFContract,
+  ChinlinkVRFAddress
 } from '../../constants/abi';
 const ethers = require("ethers") 
 
@@ -215,29 +217,24 @@ if (txc.status === 1) {
         if (txs) {
           console.log(setCollectionOfUri, "setCollectionOfUris");
         }
-let requestId;
-      
-        const callRequestRandomWords = await lotteryContract.callRequestRandomWords(
-          tokenContractAddress
-        );
-        let txrw = await callRequestRandomWords.wait();
-        if (txrw.logs && txrw.logs.length > 0) {
-          const logs = txrw.logs;
-          console.log(logs, "logs");
-           requestId = logs[0].args[1];     
-                console.log(requestId, "callRequestRandomWords");
+        const callRequestRandomWords = await lotteryContract.callRequestRandomWords(tokenContractAddress);
+        const txrw = await callRequestRandomWords.wait();
+        if (txrw.status === 1) {
+          setLoading(false);
+          console.log(txrw, "Successfully generated!");
         }
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      const getReqId = await lotteryContract.getRequestIdForCollection(tokenContractAddress);
+      console.log(getReqId.toString(), "reqId");
 
+      await new Promise(resolve => setTimeout(resolve, 30000));
         const getRequestStatus = await lotteryContract.getRequestStatus(
-          requestId
+          getReqId.toString()
         );
-        console.log(getRequestStatus, "getRequestStatus");
-        // const getWinner = await lotteryContract.getWinner(tokenContractAddress);
-        // let txwinner = await getWinner.wait();
-        // if(txwinner){
-        //   console.log(getWinner, "callRequestRandomWords");
-        //   setWinnerAddress(getWinner);
-        // }
+        console.log(getRequestStatus[1], "getRequestStatus");
+        // const getWinner = await lotteryContract.getCollectionWinner(tokenContractAddress);
+  
+        // console.log(getWinner);
       } catch (error) {
         console.error("Error submitting form:", error);
       } finally {
