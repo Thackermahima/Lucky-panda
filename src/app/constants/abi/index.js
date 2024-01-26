@@ -1,4 +1,4 @@
-export const MarketplaceContractAddress = '0x6939f6a9c0A9c9EE7bD7b2a1F9c3b50e4dB43D3a'; 
+export const MarketplaceContractAddress = '0xA595ba0b36B4122a67f52fC7CE219e12c6d2C65d'; 
 
 export const MarketplaceContractABI = [
 	{
@@ -1643,5 +1643,4 @@ export const ChainlinkVRFContract = [
 		"type": "function"
 	}
 ]
-
-export const ChinlinkVRFAddress = '0xd343946f0852C2e1b0CCA6322a9e01a3465B1dd5';
+export const ChinlinkVRFAddress = '0x18e9939D8Cf96dc51F3103c917Dc7e724CF076B4';

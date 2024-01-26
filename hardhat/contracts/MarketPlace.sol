@@ -90,7 +90,7 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard, AutomationCompatib
     //         VRFCoordinatorV2Interface(vrfCoordinator).addConsumer(subscriptionId, tokenAddress);
     // }
     
-       function setVRFContract(address _vrfContract) external {
+       function setVRFContract(address _vrfContract) external onlyOwner{
         vrfContract = ChainlinkVRF(_vrfContract);
        }
    function bulkMintERC721(
@@ -168,6 +168,10 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard, AutomationCompatib
 
     marketItems[nftContract][tokenId].owner = payable(msg.sender);
     collectionsOfSoldItems[nftContract].push(tokenId);
+    if (collectionsOfSoldItems[nftContract].length == getNFTCount) {
+        CollectionInfo storage info = collectionInfo[nftContract];
+        info.allSold = true;
+    }
     emit Bought(item.itemId, nftContract, item.tokenId, item.price, item.seller, msg.sender);
 }
 function callRequestRandomWords(address tokenAddress) public returns(uint256) {
