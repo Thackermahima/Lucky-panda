@@ -234,7 +234,8 @@ function playLottery(address collectionAddress, uint256 requestId) public {
 
     (bool fulfilled, uint256 randomTokenNumber) = getRequestStatus(requestId);
     require(fulfilled, "Random number not fulfilled");
-    winner = getWinnerAddress(collectionAddress,randomTokenNumber);
+    winner = getWinnerAddress(collectionAddress, requestId);
+    collectionWinners[collectionAddress] = winner;
 
     uint256 totalPrice = getTotalPrice(collectionAddress, randomTokenNumber);
     uint256 winnerAmount = (totalPrice * info.winnerPercentage) / 100;
@@ -252,15 +253,16 @@ function playLottery(address collectionAddress, uint256 requestId) public {
     info.lastTimeStamp = block.timestamp;
     info.allSold = false;
 }
-  function getWinnerAddress(address collectionAddress, uint256 winnerTokenId) internal view returns (address) {
-        uint256[] memory soldItems = collectionsOfSoldItems[collectionAddress];
-        require(winnerTokenId < soldItems.length, "Invalid winner tokenId");
+  function getWinnerAddress(address collectionAddress, uint256 requestId) internal view returns (address) {
+    (bool fulfilled, uint256 randomTokenNumber) = getRequestStatus(requestId);
 
-        uint256 winnerTokenIdFromSoldItems = soldItems[winnerTokenId];
-        MarketItem storage winningItem = marketItems[collectionAddress][winnerTokenIdFromSoldItems];
+    require(fulfilled, "Random number not fulfilled");
 
-        return winningItem.owner;
-    }
+    MarketItem storage winningItem = marketItems[collectionAddress][randomTokenNumber];
+
+    return winningItem.owner;
+}
+
 function getCollectionWinner(address collectionAddress) external view returns (address) {
         return collectionWinners[collectionAddress];
     }
@@ -271,8 +273,7 @@ function checkUpkeep(bytes calldata checkData)
 {
     address collectionAddress = abi.decode(checkData, (address));
     CollectionInfo memory info = collectionInfo[collectionAddress];
-    upkeepNeeded = (block.timestamp >= info.lastTimeStamp + info.updateInterval) && info.allSold;
-    
+    upkeepNeeded = (block.timestamp - info.lastTimeStamp) > info.updateInterval;    
     // Encode the requestId in the performData for later use in performUpkeep
     performData = abi.encode(lotteryRequestIds[collectionAddress]);
     
