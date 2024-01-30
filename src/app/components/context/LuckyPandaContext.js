@@ -227,7 +227,7 @@ if (txc.status === 1) {
       const getReqId = await lotteryContract.getRequestIdForCollection(tokenContractAddress);
       console.log(getReqId.toString(), "reqId");
 
-      await new Promise(resolve => setTimeout(resolve, 30000));
+      await new Promise(resolve => setTimeout(resolve, 10000));
         const getRequestStatus = await lotteryContract.getRequestStatus(
           getReqId.toString()
         );

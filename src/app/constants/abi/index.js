@@ -1,6 +1,34 @@
-export const MarketplaceContractAddress = '0xB15B10b1b51fAaE9dE84282d5b028DFDd09B9aa0'; 
+export const MarketplaceContractAddress = '0x5289f3C1F823527F8556eaA747B63aE6360E1bD5'; 
 
 export const MarketplaceContractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "nftContractAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "start",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "end",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			}
+		],
+		"name": "createMarketItem",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
 	{
 		"inputs": [],
 		"name": "OnlySimulatedBackend",
@@ -121,58 +149,6 @@ export const MarketplaceContractABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "bytes",
-				"name": "checkData",
-				"type": "bytes"
-			}
-		],
-		"name": "checkUpkeep",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "upkeepNeeded",
-				"type": "bool"
-			},
-			{
-				"internalType": "bytes",
-				"name": "performData",
-				"type": "bytes"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "nftContractAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "start",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "end",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "price",
-				"type": "uint256"
-			}
-		],
-		"name": "createMarketItem",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "string",
 				"name": "name",
 				"type": "string"
@@ -269,24 +245,6 @@ export const MarketplaceContractABI = [
 			}
 		],
 		"name": "performUpkeep",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "collectionAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "requestId",
-				"type": "uint256"
-			}
-		],
-		"name": "playLottery",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -395,6 +353,30 @@ export const MarketplaceContractABI = [
 	{
 		"stateMutability": "payable",
 		"type": "receive"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes",
+				"name": "checkData",
+				"type": "bytes"
+			}
+		],
+		"name": "checkUpkeep",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "upkeepNeeded",
+				"type": "bool"
+			},
+			{
+				"internalType": "bytes",
+				"name": "performData",
+				"type": "bytes"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
 	},
 	{
 		"inputs": [
@@ -548,6 +530,25 @@ export const MarketplaceContractABI = [
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "requestId",
+				"type": "uint256"
+			}
+		],
+		"name": "getCollectionAddress",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "collectionContract",
 				"type": "address"
@@ -667,6 +668,49 @@ export const MarketplaceContractABI = [
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "nftContract",
+				"type": "address"
+			}
+		],
+		"name": "getTotalPriceForCollection",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "collectionAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "requestId",
+				"type": "uint256"
+			}
+		],
+		"name": "getWinnerAddress",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "",
 				"type": "address"
 			},
@@ -712,6 +756,11 @@ export const MarketplaceContractABI = [
 				"internalType": "bool",
 				"name": "sold",
 				"type": "bool"
+			},
+			{
+				"internalType": "uint256",
+				"name": "escrowAmount",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -1643,6 +1692,5 @@ export const ChainlinkVRFContract = [
 		"type": "function"
 	}
 ]
-
 
 export const ChinlinkVRFAddress = '0x45F4654cf37C792FdBA7f7D0533803A11f1c9088';
