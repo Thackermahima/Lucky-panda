@@ -189,7 +189,7 @@ function purchaseItem(address nftContract, uint256 tokenId) external payable non
    uint256 escrowAmount = itemPrice; 
     item.sold = true; 
     item.escrowAmount += escrowAmount;
-    item.owner = payable(msg.sender);
+    marketItems[nftContract][tokenId].owner = payable(msg.sender);
     collectionsOfSoldItems[nftContract].push(tokenId);
 
     if (collectionsOfSoldItems[nftContract].length == getNFTCount) {
@@ -276,17 +276,37 @@ function playLottery(address collectionAddress, uint256 requestId) internal {
 
     uint256 totalEscrowedAmount = calculateTotalEscrowedAmount(collectionAddress);
 
-    uint256 feeAmount = calculateFee(totalEscrowedAmount);
-    uint256 amountAfterFees = totalEscrowedAmount - feeAmount;
+    // Calculate the winner's prize directly from the escrow amount.
+    uint256 winnerPrize = (totalEscrowedAmount * info.winnerPercentage) / 100;
 
-    // Calculate the winner's prize based on the amount after fees.
-    uint256 winnerPrize = (amountAfterFees * info.winnerPercentage) / 100;
-    transferPrizeToWinner(winner, winnerPrize);
+    // Send the winner's prize.
+    (bool winnerSent, ) = payable(winner).call{value: winnerPrize}("");
+    require(winnerSent, "Failed to send prize to winner");
 
-    // Distribute the remaining amount after the winner's prize to the sellers.
-    distributeFundsToSellers(collectionAddress, amountAfterFees, winnerPrize);
+    // Calculate the remaining amount to be sent to the seller (creator of the collection).
+    uint256 remainingToSeller = totalEscrowedAmount - winnerPrize;
 
+    // Assuming the first item's seller is the collection's creator.
+    if(contractTokenIds[collectionAddress].length > 0) {
+        MarketItem storage firstItem = marketItems[collectionAddress][0];
+        address payable sellerAddress = firstItem.seller;
+
+        // Send the remaining amount to the seller.
+        (bool sellerSent, ) = sellerAddress.call{value: remainingToSeller}("");
+        require(sellerSent, "Failed to send remaining funds to seller");
+
+        // Reset escrow amounts for all items in the collection.
+        for (uint256 i = 0; i < contractTokenIds[collectionAddress].length; i++) {
+            marketItems[collectionAddress][i].escrowAmount = 0;
+        }
+    }
+
+    // Reset the collection for the next lottery.
+    info.lastTimeStamp = block.timestamp;
+    info.allSold = false;
 }
+
+
 
 function calculateTotalEscrowedAmount(address collectionAddress) private view returns (uint256 totalEscrowed) {
     uint256 totalTokens = contractTokenIds[collectionAddress].length;
@@ -300,33 +320,6 @@ function calculateTotalEscrowedAmount(address collectionAddress) private view re
 
 function calculateFee(uint256 amount) private view returns (uint256) {
     return (amount * feePercent) / 100;
-}
-
-function transferPrizeToWinner(address winner, uint256 winnerPrize) private {
-    uint256 winnerAmountAfterFee = winnerPrize;
-    
-    (bool sent, ) = payable(winner).call{value: winnerAmountAfterFee}("");
-    require(sent, "Failed to send Ether to winner");
-}
-
-function distributeFundsToSellers(address collectionAddress, uint256 totalEscrowedAmount, uint256 winnerPrize) private {
-    uint256 totalSellerAmount = totalEscrowedAmount - winnerPrize;
-    uint256 totalTokens = contractTokenIds[collectionAddress].length;
-
-    if(contractTokenIds[collectionAddress].length > 0) {
-        uint256 firstTokenId = contractTokenIds[collectionAddress][0];
-        MarketItem storage firstItem = marketItems[collectionAddress][firstTokenId];
-        address payable sellerAddress = firstItem.seller;
-        
-        // Send the total seller amount to the seller.
-        (bool sent, ) = sellerAddress.call{value: totalSellerAmount}("");
-        require(sent, "Failed to send Ether to seller");
-
-        for (uint256 i = 0; i < totalTokens; i++) {
-            uint256 tokenId = contractTokenIds[collectionAddress][i];
-            marketItems[collectionAddress][tokenId].escrowAmount = 0;
-        }
-    }
 }
 
   function getWinnerAddress(address collectionAddress, uint256 requestId) public view returns (address) {
