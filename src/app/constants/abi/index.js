@@ -1,4 +1,4 @@
-export const MarketplaceContractAddress = '0x508b6e779759FD081f76CA6bF14913F776f89687'; 
+export const MarketplaceContractAddress = '0xaf8D0AEFa7B7DE9852AC10430547fEAdce6Da4e5'; 
 
 export const MarketplaceContractABI = [
 	{
@@ -340,25 +340,26 @@ export const MarketplaceContractABI = [
 	{
 		"inputs": [
 			{
+				"internalType": "address payable",
+				"name": "destination",
+				"type": "address"
+			},
+			{
 				"internalType": "uint256",
 				"name": "amount",
 				"type": "uint256"
 			}
 		],
-		"name": "withdrawFunds",
+		"name": "withdrawCollectedFees",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"stateMutability": "payable",
-		"type": "receive"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "bytes",
-				"name": "checkData",
+				"name": "",
 				"type": "bytes"
 			}
 		],
@@ -713,6 +714,25 @@ export const MarketplaceContractABI = [
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"name": "lotteryRequestIds",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
 			},
 			{
 				"internalType": "uint256",
@@ -808,6 +828,19 @@ export const MarketplaceContractABI = [
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalFeesCollected",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
