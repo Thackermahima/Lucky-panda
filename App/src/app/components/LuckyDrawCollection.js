@@ -161,7 +161,7 @@ useEffect(() => {
          <Typography variant="h5" align="center" style={{ marginTop: '2rem' }}>
 Explore Lottery Collections 
 </Typography>
-        <Card sx={{ width:'20%'}}>
+        <Card sx={{ width:'20%'}} >
         {console.log(Img,"Img")}  
 
         {Img.length > 0 ? <div>
@@ -182,8 +182,16 @@ Explore Lottery Collections
 {console.log(i.price, "i.price")}
 {console.log(i.address, "i.address")}
 {console.log(price, "i.price")}
-
-            <button class="btn btn-outline-success mb-5" onClick={() => purchaseItem(i.address,img.tokenID)}>Buy for {i.price}</button>
+<Button
+              variant="contained"
+              size='small'
+              style={{ backgroundColor: "#D82148", textTransform: 'capitalize', border: '2px solid #D82148', fontWeight: 'bold' }}
+              sx={{ borderRadius: 1 }}
+              onClick={() => purchaseItem(i.address,img.tokenID)}
+            >
+              Buy for {i.price}
+            </Button>
+            {/* <button class="btn btn-outline-success mb-5" onClick={() => purchaseItem(i.address,img.tokenID)}>Buy for {i.price}</button> */}
             </>
 
           )
@@ -199,6 +207,8 @@ Explore Lottery Collections
       
       </Card>
       </Box>
+
+
     );
   
   

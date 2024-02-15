@@ -335,7 +335,12 @@ function calculateFee(uint256 amount) private view returns (uint256) {
 function getCollectionWinner(address collectionAddress) external view returns (address) {
         return collectionWinners[collectionAddress];
     }
-function checkUpkeep(bytes calldata /* checkData */) external view override returns (bool upkeepNeeded, bytes memory performData) {
+    
+function checkUpkeep(bytes calldata /* checkData */) 
+external
+view 
+override 
+returns (bool upkeepNeeded, bytes memory performData) {
     for (uint i = 0; i < CollectionAddresses.length; i++) {
         address collectionAddress = CollectionAddresses[i];
         CollectionInfo memory info = collectionInfo[collectionAddress];
@@ -353,13 +358,11 @@ function checkUpkeep(bytes calldata /* checkData */) external view override retu
     return (false, "");
 }
 
-
 function performUpkeep(bytes calldata performData) external override {
     address collectionAddress = abi.decode(performData, (address));
     CollectionInfo memory info = collectionInfo[collectionAddress];
     if ((block.timestamp - info.lastTimeStamp) > info.updateInterval && info.allSold) {
-        // Note: If playLottery requires a requestId, you need to fetch or generate it appropriately
-        uint256 requestId = lotteryRequestIds[collectionAddress]; // Example, if lotteryRequestIds is already set somewhere
+        uint256 requestId = lotteryRequestIds[collectionAddress];
         playLottery(collectionAddress, requestId);
     }
 }
