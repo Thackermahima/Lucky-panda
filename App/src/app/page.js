@@ -37,7 +37,10 @@ import { Routes,Route,BrowserRouter}from "react-router-dom";
 import { Web3ContextProvider } from "./components/context/Web3Context";
 import { LuckyPandaContextProvider } from "./components/context/LuckyPandaContext";
 import Landing1 from "./components/Pages/Landing1";
+import Header from './components/Pages/Header';
 import Footer from "./components/Pages/Footer";
+import './globals.css';
+
 export default function Home() {
   
   return (
@@ -45,6 +48,7 @@ export default function Home() {
     <BrowserRouter>
 <Web3ContextProvider>
 <LuckyPandaContextProvider>
+  <Header />
   <Landing1 />
   <Footer />
 </LuckyPandaContextProvider>

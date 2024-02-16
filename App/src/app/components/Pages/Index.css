@@ -1,52 +1,148 @@
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin1 {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 @keyframes float {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
+  0%, 100% {
+    transform: translateY(0);
   }
-  
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
+  50% {
+    transform: translateY(-20px);
   }
-  
-  .hero {
-    position: relative;
+}
+/* Keyframes for horizontal movement */
+@keyframes move-horizontally {
+  0%, 100% {
+    transform: translateX(0);
   }
-  
-  .animatedImage::before,
-  .animatedImage::after {
-    content: '';
-    display: block; /* This is necessary for pseudo-elements to be visible */
-    position: absolute;
-    background-size: contain;
-    background-repeat: no-repeat;
+  50% {
+    transform: translateX(200px); /* Adjust the value as needed */
   }
+}
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+}
+
+.content-section {
+  padding: 2rem; /* Add padding for better spacing */
+}
+
+
+
+.imageContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 2;
+}
+
+.img-fluid {
+  max-width: 90%; /* Limit the image size */
+  height: auto;
+  margin-right: -50px; /* Adjust based on the exact layout */
+}
+
+/* Typography adjustments for a more professional look */
+.display-4 {
+  font-size: 2.5rem; /* Adjust the size for better readability */
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #333; /* Dark text for contrast */
+}
+
+.lead {
+  color: #555; /* Slightly lighter color for the description */
+  font-size: 1.2rem;
+}
+
+.btn-primary {
+  background-color: #0056b3; /* Example primary color */
+  border-color: #0056b3; /* Example border color */
+  padding: 0.75rem 1.5rem; /* Larger button padding */
+  font-size: 1rem; /* Larger font size for the button */
+  border-radius: 0.5rem; /* Rounded corners for the button */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.btn-primary:hover {
+  background-color: #004494; /* Darken the button on hover */
+}
   
-  .animatedImage::before {
-    top: -10px; /* Adjust as needed */
-    left: -10px; /* Adjust as needed */
-    width: 40px; /* Adjust as needed */
-    height: 40px; /* Adjust as needed */
-    background-image: url('/Treasure.webp'); /* Update this path as needed */
-    animation: spin 2s linear infinite, float 5s ease-in-out infinite;
-  }
-  
-  .animatedImage::after {
-    bottom: -10px; /* Adjust as needed */
-    right: -10px; /* Adjust as needed */
-    width: 40px; /* Adjust as needed */
-    height: 40px; /* Adjust as needed */
-    background-image: url('/star.webp'); /* Update this path as needed */
-    animation: spin 3s linear infinite reverse, float 6s ease-in-out infinite;
-  }
-  
-  
-  
+
+/* Generic styles for all coins */
+.coin {
+  position: absolute;
+  background-image: url('/Treasure.png'); /* Update with actual path */
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: spin 6s linear infinite, float 3s ease-in-out infinite;
+}
+
+.big-coin {
+  position: absolute;
+  top: 5%; /* Adjust as needed to position the coin */
+  left: 34%; /* Center the coin horizontally */
+  transform: translate(-50%, -50%) rotate(0deg); /* Initial position and rotation */
+  width: 150px; /* Size of the big coin */
+  height: 150px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: spin 10s linear infinite; /* Apply the spin animation */
+}
+
+.medium-coin {
+  position: absolute;
+  bottom: 10%; /* Position it below the image */
+  left: 40%; /* Start from the middle of the container */
+  transform: translateX(-50%);
+  width: 100px; /* Adjust the size as needed */
+  height: 100px;
+  z-index: 1; /* Below the image (assuming the image has a higher z-index) */
+  animation: move-horizontally 5s ease-in-out infinite alternate;
+}
+
+.small-coin-before {
+  top: 50%;
+  left: 50%;
+  width: 50px; /* Small coin size */
+  height: 50px;
+  z-index: 0;
+}
+.sticky-coin {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  background-image: url('/Treasure.png'); /* Update with actual path */
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 50px; /* Set the width of the coin */
+  height: 50px; /* Set the height of the coin */
+  z-index: 10; /* Ensure it's above other elements */
+}
+.small-coin-above {
+  top: 5%;
+  right: 10%;
+  width: 50px; /* Small coin size */
+  height: 50px;
+  z-index: 2; /* Above the panda image */
+}
+
+
   
