@@ -1,0 +1,18 @@
+.about-image img {
+    border-radius: 1rem; /* Rounded corners */
+    box-shadow: 0 8px 30px rgba(20, 57, 219, 0.5); /* Custom gradient shadow */
+  }
+  
+  
+  /* Responsive design adjustments */
+  @media (max-width: 991px) {
+    .about-content {
+      padding-right: 0; /* Resets spacing on smaller screens */
+    }
+  
+    .about-image img {
+      max-width: 100%; /* Ensures the image is not too large on small screens */
+      height: auto; /* Maintains aspect ratio */
+    }
+  }
+  
