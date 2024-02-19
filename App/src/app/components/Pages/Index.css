@@ -153,12 +153,13 @@
   }
   
   .step-card {
-    width: 160px; /* or whatever size you desire */
-    height: 160px; /* to make it square, ensure the height and width are the same */
+    width: 220px; /* or whatever size you desire */
+    height: 220px; /* to make it square, ensure the height and width are the same */
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    background-color: #ffbc5c;
   }
   
   .card-body h5 {
@@ -178,4 +179,43 @@
   }
   
 
-  
+  .under-line {
+  border: 2px solid #76ba5c;
+  width: 21%;
+  margin: 0 auto 15px;
+}
+
+.under-line1 {
+  border: 2px solid #76ba5c;
+  width: 40%;
+  margin: 0 auto 15px;
+}
+/* Footer */
+
+.lucky-panda-footer {
+  /* background-color: #343a40; Dark footer background */
+  color: #f8f9fa; /* Light text color */
+}
+
+.lucky-panda-footer a {
+  color: #f8f9fa; /* Light link color */
+}
+
+.lucky-panda-footer a:hover {
+  color: #ffc107; /* Gold color for hover state */
+}
+
+/* Social icons style */
+.fab {
+  font-size: 1.5rem; /* Larger icons for visibility */
+}
+.social-icon {
+  margin-right: 10px; /* Spacing between icons */
+  font-size: 24px; /* Size of icons */
+  color: #fff; /* Icon color */
+}
+
+.social-icon:hover {
+  color: #ccc; /* Icon hover color */
+}
+
