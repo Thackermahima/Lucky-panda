@@ -145,4 +145,37 @@
 }
 
 
+  /* How it works section */
+
+  .how-it-works-section {
+    margin-top: 7%;
+    background-color: #8df8a5;
+  }
+  
+  .step-card {
+    width: 160px; /* or whatever size you desire */
+    height: 160px; /* to make it square, ensure the height and width are the same */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  .card-body h5 {
+    margin-bottom: 0.5rem;
+  }
+  
+  */
+  /* Additional professional styling for the card */
+  .step-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+  }
+  
+  /* Styling for the arrows */
+  .fa-arrow-right {
+    color: #191970; /* Match the arrow color with your design */
+  }
+  
+
   

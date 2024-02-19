@@ -40,24 +40,24 @@ import Landing1 from "./components/Pages/Landing1";
 import Landing2 from './components/Pages/Landing2';
 import Header from './components/Pages/Header';
 import Footer from "./components/Pages/Footer";
-
+import Landing3 from './components/Pages/Landing3';
 import './globals.css';
 
 export default function Home() {
   
   return (
     <div>
-    <BrowserRouter>
+<BrowserRouter>
 <Web3ContextProvider>
 <LuckyPandaContextProvider>
   <Header />
   <Landing1 />
   <Landing2 />
+  <Landing3 />
   <Footer />
 </LuckyPandaContextProvider>
 </Web3ContextProvider>
 </BrowserRouter>
-
     </div>
   )
 }
