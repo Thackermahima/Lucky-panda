@@ -219,3 +219,9 @@
   color: #ccc; /* Icon hover color */
 }
 
+@media (min-width: 992px) { /* Adjusting for large screens */
+  .navbar .dropdown-menu {
+    left: auto; /* Resetting default positioning */
+    right: 0;   /* Aligning to the right edge of the parent */
+  }
+}
