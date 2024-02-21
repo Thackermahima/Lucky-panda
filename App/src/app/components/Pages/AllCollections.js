@@ -91,57 +91,65 @@ export default function AllCollections() {
         //  })
         
         obj.images = [];
-        console.log(response.data.imgTokenUrl,"imgTokenUrl");
         response.data.imgTokenUrl.map((uri) => {
         obj.images.push(uri);
         })
-        console.log(obj,"obj");
        images.push(obj);
-       console.log(images, "images");
        setImg(images);
        })
       .catch((err) => {
         console.log(err,"error from axious response");
       })
       })
-  },[collectionUris])
+  },[collections])
   console.log(collections, "collections");
-    return (
-        <>
-          <div className="container py-5">
-      <div className="row g-4">
-        {
-          Img.map((i) => 
-          console.log(Img, "Imgsss")
+  console.log(Img, "Imggg");
 
-          (
-            <div className="col-12 col-md-6 col-lg-4"> {/* Adjust the column sizes as needed */}
-              <div className="card h-100">
-             { 
-             i.images.map((img) => (
-              <>
-              <img src={img.url} className="card-img-top" width='230px' height='230px' alt={`${i.name}'s collection`} />
+  return (
+    <>
+      <div className="container py-5">
+      {Img.map((i) => (
+            <>
 
-              <div className="card-body">
-                <button
-                            type="button"
-                            class="btn btn-outline-success"
-                            onClick={() => purchaseItem(i.address,img.tokenID)}
-
-                          >
-                            Buy for {i.price}
-                            </button>
-                </div>
-                </>
-
-             )
-            )}  
-              </div>
+<div className="row justify-content-center mb-5">
+              <h2 className="col-12 text-center mb-2 fw-bold">{i.name}</h2>
+              <h3 className="col-12 text-center text-muted">{i.address}</h3>
             </div>
-          ))
-        }
-      </div>
-    </div>
+
+
+      <div className="row row-cols-1 row-cols-md-3 g-4">
+                {i.images.map((img) => (
+                  <>
+                                 <div className="col" key={i.images[0].tokenID}> {/* Adjust the column sizes as needed */}
+
+                                 <div className="card h-100 text-center">
+
+                    <img src={img.url} className="card-img-top" alt={`${i.name}'s collection`} style={{ width: '100%', height: 'auto' }} />
+                    <div className="card-body">
+                      <h5 className="card-title"> tokenId: {img.tokenID}</h5>
+
+                      
+                      <button
+                        type="button"
+                        className="btn btn-outline-success  mx-auto d-block"
+                        onClick={() => purchaseItem(i.address, img.tokenID)}
+                      >
+                        Buy for {i.price}
+                      </button>
+                    </div>
+                    </div>
+                    </div>
+
+                  </>
+                ))}
+
+        </div>
         </>
-    )
+      ))}
+
+      </div>
+
+    </>
+  )
+  
 }
