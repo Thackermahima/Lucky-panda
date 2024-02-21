@@ -26,8 +26,9 @@ export const LuckyPandaContextProvider = (props) => {
     const [AllFilesArr, setAllFilesArr] = useState([]);
     const [AllTokenURIs, setAllTokenURIs] = useState([]);
     const [getCollection, setGetCollection] = useState();
-    const [winnerAddress, setWinnerAddress] = useState("");
-
+    const [collectionUris, setCollectionUris] = useState([]);
+    const [soldItems, setSoldItems] = useState([]);
+    
     const notify = () => toast("NFT Created Successfully !!");
 
     const nameEvent = (e) => {
@@ -246,6 +247,41 @@ if (txc.status === 1) {
         setLoading(false);
       }
     };
+
+    async function getAllCollection(){
+      let getCollectionOfUri;
+      const accounts = await window.ethereum.request({
+              method: "eth_requestAccounts",
+            });
+            const address = accounts[0];
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const MarketpaceContract = new ethers.Contract(
+              MarketplaceContractAddress,
+              MarketplaceContractABI,
+              signer
+            );
+     
+      
+      const allContractAddresses = await MarketpaceContract.getAllContractAddresses();
+      console.log(allContractAddresses, "allContractAddress");
+      const collectionuris = await Promise.all(
+        allContractAddresses.map(async(addrs) => {
+          const uri = await MarketpaceContract.getCollectionUri(addrs);
+          const soldItems = await MarketpaceContract.getAllSoldItems(addrs);
+    
+          // const tokenId = await MarketpaceContract.getAllTokenId(addrs);
+          // console.log(tokenId, "tokenIds");
+          console.log(addrs, "addrs from collectionuris");
+          console.log(uri, "uri from collectionuris");
+          return {address: addrs, uri: uri, soldItems: soldItems};
+        })
+    
+        );
+      setCollectionUris(collectionuris);
+      setSoldItems(soldItems);
+    
+    }
     
     const Item = {
       name: name,
@@ -279,7 +315,9 @@ if (txc.status === 1) {
           loading,
           onFormSubmit,
           getCollection,
-          AllFilesArr
+          AllFilesArr,
+          getAllCollection,
+          collectionUris
         }}
         >
           {props.children} 

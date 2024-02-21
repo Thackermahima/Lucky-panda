@@ -24,7 +24,7 @@ export default function Home() {
   <Route path="/" element={<LandingPage /> } />
   <Route path="/create-lottery" element={<CreateLottery />} />
   <Route path="/lucky-draw-collections" element={<LuckyDrawCollection />} />
-  <Route path="/all-collections" element={<AllCollections />} />
+  <Route path="/all-collections/:address" element={<AllCollections />} />
 
  
   </Routes>
