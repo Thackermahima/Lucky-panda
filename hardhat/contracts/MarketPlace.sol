@@ -59,14 +59,15 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard, AutomationCompatib
         address indexed seller,
         address indexed buyer
     );
+
    struct CollectionInfo {
      uint256 updateInterval;
      uint256 lastTimeStamp;
      uint256 winnerPercentage;
      bool allSold;
    }
-  mapping(address => CollectionInfo) public collectionInfo;
 
+  mapping(address => CollectionInfo) public collectionInfo;
 
     function createToken(
         string memory name,
@@ -83,12 +84,9 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard, AutomationCompatib
     });
         uint256 count = 0;
         tokens[msg.sender].push(_address);
-     if (msg.sender != owner()) { // Assuming `owner()` is a function that returns the contract owner's address
         CollectionAddresses.push(_address);
-     }
-             count++;
+        count++;
         emit TokenCreated(msg.sender, _address);
-        // addNFTConsumer(subscriptionId, _address);
     }
     // function addNFTConsumer(uint64 subscriptionId, address tokenAddress) public  {
     //         VRFCoordinatorV2Interface(vrfCoordinator).addConsumer(subscriptionId, tokenAddress);
@@ -184,22 +182,20 @@ function purchaseItem(address nftContract, uint256 tokenId) external payable non
     uint256 _totalPrice = getTotalPrice(nftContract, tokenId);
     MarketItem storage item = marketItems[nftContract][tokenId];
     uint256 itemPrice = item.price;
-
     require(msg.value >= _totalPrice, "Not enough ether to cover item price and market fee");
     require(!item.sold, "Item already sold");
-   uint256 feeAmount = calculateFee(itemPrice);
-   uint256 escrowAmount = itemPrice; 
+    uint256 feeAmount = calculateFee(itemPrice);
+    uint256 escrowAmount = itemPrice; 
     item.sold = true; 
     item.escrowAmount += escrowAmount;
     marketItems[nftContract][tokenId].owner = payable(msg.sender);
     collectionsOfSoldItems[nftContract].push(tokenId);
-
     if (collectionsOfSoldItems[nftContract].length == getNFTCount) {
         collectionInfo[nftContract].allSold = true;
     }
-
     emit Bought(item.itemId, nftContract, item.tokenId, item.price, item.seller, msg.sender);
 }
+
 function callRequestRandomWords(address tokenAddress) public returns(uint256) {
     uint256 nftCount = contractTokenIds[tokenAddress].length;
     uint256 requestId = vrfContract.requestRandomWords(nftCount, tokenAddress);
@@ -233,25 +229,37 @@ function getAllTokenId(address tokenContractAddress) public view returns (uint[]
     return ret;
 }
   
-  function getAllContractAddresses() public view returns(address[] memory) {
-    address[] memory allAddresses = new address[](CollectionAddresses.length);
-    uint256 counter = 0;
-    
-    for(uint i = 0; i < CollectionAddresses.length; i++) {
-        if(!isOwnerAddress(CollectionAddresses[i])) {
-            allAddresses[counter] = CollectionAddresses[i];
-            counter++;
+  function getAllContractAddresses() public view returns (address[] memory) {
+    uint256 totalContracts = CollectionAddresses.length;
+    uint256 senderContractCount = tokens[msg.sender].length;
+
+    // Calculate the size of the new array
+    uint256 size = totalContracts - senderContractCount;
+    address[] memory allExceptSender = new address[](size);
+
+    uint256 currentIndex = 0;
+
+    for (uint256 i = 0; i < totalContracts; i++) {
+        address contractAddress = CollectionAddresses[i];
+        bool isSenderContract = false;
+
+        // Check if the current address is in the sender's list
+        for (uint256 j = 0; j < senderContractCount; j++) {
+            if (contractAddress == tokens[msg.sender][j]) {
+                isSenderContract = true;
+                break;
+            }
+        }
+
+        // If it's not the sender's contract, add it to the return array
+        if (!isSenderContract) {
+            allExceptSender[currentIndex] = contractAddress;
+            currentIndex++;
         }
     }
-    
-    // Trim the array to the counter size
-    address[] memory filteredAddresses = new address[](counter);
-    for(uint i = 0; i < counter; i++) {
-        filteredAddresses[i] = allAddresses[i];
+
+    return allExceptSender;
     }
-    
-    return filteredAddresses;
-}
 
 function isOwnerAddress(address _address) internal view returns(bool) {
     address[] memory ownerAddresses = tokens[msg.sender];
