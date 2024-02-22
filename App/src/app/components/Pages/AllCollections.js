@@ -107,49 +107,45 @@ export default function AllCollections() {
 
   return (
     <>
-      <div className="container py-5">
+    <div className="container py-5">
       {Img.map((i) => (
-            <>
+        <div key={i.name}>
+          <div className="row justify-content-center mb-5">
+            <h2 className="col-12 text-center mb-2 fw-bold">{i.name}</h2>
+            <h3 className="col-12 text-center text-muted">{i.address}</h3>
+          </div>
 
-<div className="row justify-content-center mb-5">
-              <h2 className="col-12 text-center mb-2 fw-bold">{i.name}</h2>
-              <h3 className="col-12 text-center text-muted">{i.address}</h3>
-            </div>
+          <div className="row row-cols-1 row-cols-md-3 g-4">
+            {i.images.map((img) => {
+              // Check if the tokenId is in the sold items list
+              const isSold = collections.some(
+                (collection) => collection.address === i.address &&
+                collection.soldItems.includes(img.tokenID)
+              );
 
-
-      <div className="row row-cols-1 row-cols-md-3 g-4">
-                {i.images.map((img) => (
-                  <>
-                                 <div className="col" key={i.images[0].tokenID}> {/* Adjust the column sizes as needed */}
-
-                                 <div className="card h-100 text-center">
-
+              return (
+                <div className="col" key={img.tokenID}>
+                  <div className="card h-100 text-center">
                     <img src={img.url} className="card-img-top" alt={`${i.name}'s collection`} style={{ width: '100%', height: 'auto' }} />
                     <div className="card-body">
-                      <h5 className="card-title"> tokenId: {img.tokenID}</h5>
-
-                      
+                      <h5 className="card-title">tokenId: {img.tokenID}</h5>
                       <button
                         type="button"
-                        className="btn btn-outline-success  mx-auto d-block"
-                        onClick={() => purchaseItem(i.address, img.tokenID)}
+                        className={`btn ${isSold ? 'btn-secondary' : 'btn-outline-success'} mx-auto d-block`}
+                        onClick={() => !isSold && purchaseItem(i.address, img.tokenID)}
+                        disabled={isSold}
                       >
-                        Buy for {i.price}
+                        {isSold ? 'Sold Out' : `Buy for ${i.price}`}
                       </button>
                     </div>
-                    </div>
-                    </div>
-
-                  </>
-                ))}
-
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-        </>
       ))}
-
-      </div>
-
-    </>
-  )
-  
+    </div>
+  </>
+);
 }

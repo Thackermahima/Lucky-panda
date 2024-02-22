@@ -274,7 +274,7 @@ if (txc.status === 1) {
           // console.log(tokenId, "tokenIds");
           console.log(addrs, "addrs from collectionuris");
           console.log(uri, "uri from collectionuris");
-          return {address: addrs, uri: uri, soldItems: soldItems};
+          return {address: addrs, uri: uri, soldItems: soldItems.toString()};
         })
     
         );

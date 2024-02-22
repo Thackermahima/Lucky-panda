@@ -9,6 +9,8 @@ import LandingPage from './components/Pages/LandingPage';
 import CreateLottery from './components/Pages/CreateLottery';
 import LuckyDrawCollection from './components/Pages/LuckyDrawCollections';
 import AllCollections from './components/Pages/AllCollections';
+import MyCollection from './components/Pages/MyCollection';
+
 import './globals.css';
 
 export default function Home() {
@@ -25,6 +27,7 @@ export default function Home() {
   <Route path="/create-lottery" element={<CreateLottery />} />
   <Route path="/lucky-draw-collections" element={<LuckyDrawCollection />} />
   <Route path="/all-collections/:address" element={<AllCollections />} />
+  <Route path="/my-collections" element={<MyCollection />} />
 
  
   </Routes>

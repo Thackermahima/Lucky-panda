@@ -1,4 +1,4 @@
-export const MarketplaceContractAddress = '0xaf8D0AEFa7B7DE9852AC10430547fEAdce6Da4e5'; 
+export const MarketplaceContractAddress = '0x5054258E696b6383A5b8E4BC7b32Fa02167A6fc6'; 
 
 export const MarketplaceContractABI = [
 	{
@@ -593,6 +593,19 @@ export const MarketplaceContractABI = [
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getOwnerContractAddresses",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "",
+				"type": "address[]"
 			}
 		],
 		"stateMutability": "view",

@@ -83,8 +83,10 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard, AutomationCompatib
     });
         uint256 count = 0;
         tokens[msg.sender].push(_address);
+     if (msg.sender != owner()) { // Assuming `owner()` is a function that returns the contract owner's address
         CollectionAddresses.push(_address);
-        count++;
+     }
+             count++;
         emit TokenCreated(msg.sender, _address);
         // addNFTConsumer(subscriptionId, _address);
     }
@@ -232,9 +234,39 @@ function getAllTokenId(address tokenContractAddress) public view returns (uint[]
 }
   
   function getAllContractAddresses() public view returns(address[] memory) {
-   return CollectionAddresses;
-  }
-  
+    address[] memory allAddresses = new address[](CollectionAddresses.length);
+    uint256 counter = 0;
+    
+    for(uint i = 0; i < CollectionAddresses.length; i++) {
+        if(!isOwnerAddress(CollectionAddresses[i])) {
+            allAddresses[counter] = CollectionAddresses[i];
+            counter++;
+        }
+    }
+    
+    // Trim the array to the counter size
+    address[] memory filteredAddresses = new address[](counter);
+    for(uint i = 0; i < counter; i++) {
+        filteredAddresses[i] = allAddresses[i];
+    }
+    
+    return filteredAddresses;
+}
+
+function isOwnerAddress(address _address) internal view returns(bool) {
+    address[] memory ownerAddresses = tokens[msg.sender];
+    for(uint i = 0; i < ownerAddresses.length; i++) {
+        if(ownerAddresses[i] == _address) {
+            return true;
+        }
+    }
+    return false;
+}
+
+ function getOwnerContractAddresses() public view returns(address[] memory) {
+  return tokens[msg.sender];
+}
+
   function getAllSoldItems(address nftContract) external view returns (uint256[] memory) {
         return collectionsOfSoldItems[nftContract];
     }
@@ -335,12 +367,7 @@ function calculateFee(uint256 amount) private view returns (uint256) {
 function getCollectionWinner(address collectionAddress) external view returns (address) {
         return collectionWinners[collectionAddress];
     }
-    
-function checkUpkeep(bytes calldata /* checkData */) 
-external
-view 
-override 
-returns (bool upkeepNeeded, bytes memory performData) {
+function checkUpkeep(bytes calldata /* checkData */) external view override returns (bool upkeepNeeded, bytes memory performData) {
     for (uint i = 0; i < CollectionAddresses.length; i++) {
         address collectionAddress = CollectionAddresses[i];
         CollectionInfo memory info = collectionInfo[collectionAddress];
@@ -358,11 +385,13 @@ returns (bool upkeepNeeded, bytes memory performData) {
     return (false, "");
 }
 
+
 function performUpkeep(bytes calldata performData) external override {
     address collectionAddress = abi.decode(performData, (address));
     CollectionInfo memory info = collectionInfo[collectionAddress];
     if ((block.timestamp - info.lastTimeStamp) > info.updateInterval && info.allSold) {
-        uint256 requestId = lotteryRequestIds[collectionAddress];
+        // Note: If playLottery requires a requestId, you need to fetch or generate it appropriately
+        uint256 requestId = lotteryRequestIds[collectionAddress]; // Example, if lotteryRequestIds is already set somewhere
         playLottery(collectionAddress, requestId);
     }
 }
