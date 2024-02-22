@@ -1,4 +1,4 @@
-export const MarketplaceContractAddress = '0x5054258E696b6383A5b8E4BC7b32Fa02167A6fc6'; 
+export const MarketplaceContractAddress = '0x449f109e26296b81D4F24568Bd8Ab7acF705dB46'; 
 
 export const MarketplaceContractABI = [
 	{

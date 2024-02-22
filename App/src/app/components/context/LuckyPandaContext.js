@@ -28,7 +28,8 @@ export const LuckyPandaContextProvider = (props) => {
     const [getCollection, setGetCollection] = useState();
     const [collectionUris, setCollectionUris] = useState([]);
     const [soldItems, setSoldItems] = useState([]);
-    
+    const [mycollectionUris, setMyCollectionUris] = useState([]);
+
     const notify = () => toast("NFT Created Successfully !!");
 
     const nameEvent = (e) => {
@@ -282,6 +283,39 @@ if (txc.status === 1) {
       setSoldItems(soldItems);
     
     }
+
+    async function getAllMyCollection(){
+      const accounts = await window.ethereum.request({
+              method: "eth_requestAccounts",
+            });
+            const address = accounts[0];
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const MarketpaceContract = new ethers.Contract(
+              MarketplaceContractAddress,
+              MarketplaceContractABI,
+              signer
+            );
+     
+      
+            try {
+              const myCollectionAddresses = await MarketpaceContract.getOwnerContractAddresses();
+              const collectionuris = await Promise.all(
+                myCollectionAddresses.map(async(addrs) => {
+                  const uri = await MarketpaceContract.getCollectionUri(addrs);              
+                  console.log(addrs, "addrs from collectionuris");
+                  console.log(uri, "uri from collectionuris");
+                  return {address: addrs, uri: uri};
+                })
+            
+                );
+              console.log(myCollectionAddresses, "myCollectionAddresses");
+              console.log(collectionuris, "collectionUriss");
+              setMyCollectionUris(collectionuris)
+            } catch (error) {
+              console.error("Error fetching my collections: ", error);
+            }    
+    }
     
     const Item = {
       name: name,
@@ -317,7 +351,9 @@ if (txc.status === 1) {
           getCollection,
           AllFilesArr,
           getAllCollection,
-          collectionUris
+          collectionUris,
+          getAllMyCollection,
+          mycollectionUris
         }}
         >
           {props.children} 

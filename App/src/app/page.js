@@ -10,7 +10,7 @@ import CreateLottery from './components/Pages/CreateLottery';
 import LuckyDrawCollection from './components/Pages/LuckyDrawCollections';
 import AllCollections from './components/Pages/AllCollections';
 import MyCollection from './components/Pages/MyCollection';
-
+import MyCollectionDetail from './components/Pages/MyCollectionDetail';
 import './globals.css';
 
 export default function Home() {
@@ -21,15 +21,15 @@ export default function Home() {
 <Web3ContextProvider>
 <LuckyPandaContextProvider>
   <Header />
- 
   <Routes>
+
   <Route path="/" element={<LandingPage /> } />
   <Route path="/create-lottery" element={<CreateLottery />} />
   <Route path="/lucky-draw-collections" element={<LuckyDrawCollection />} />
   <Route path="/all-collections/:address" element={<AllCollections />} />
   <Route path="/my-collections" element={<MyCollection />} />
+  <Route path="/all-mycollections/:address" element={<MyCollectionDetail /> } />
 
- 
   </Routes>
   <Footer />
 </LuckyPandaContextProvider>
