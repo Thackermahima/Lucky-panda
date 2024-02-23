@@ -1,4 +1,4 @@
-export const MarketplaceContractAddress = '0x449f109e26296b81D4F24568Bd8Ab7acF705dB46'; 
+export const MarketplaceContractAddress = '0x54aE85e193b1ccC09A1bb21D9bEdBA9A1c365bA9'; 
 
 export const MarketplaceContractABI = [
 	{
@@ -444,8 +444,13 @@ export const MarketplaceContractABI = [
 		"outputs": [
 			{
 				"internalType": "address",
-				"name": "",
+				"name": "winnerAddress",
 				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "winningTokenId",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -580,6 +585,11 @@ export const MarketplaceContractABI = [
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -716,6 +726,11 @@ export const MarketplaceContractABI = [
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -865,19 +880,6 @@ export const MarketplaceContractABI = [
 		"outputs": [
 			{
 				"internalType": "contract ChainlinkVRF",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "winner",
-		"outputs": [
-			{
-				"internalType": "address",
 				"name": "",
 				"type": "address"
 			}

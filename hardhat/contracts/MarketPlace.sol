@@ -18,15 +18,15 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard, AutomationCompatib
     mapping (address => mapping(uint256 => MarketItem)) public marketItems;  // Updated mapping for collection to MarketItem
     mapping (address => string) collections;
     mapping(address => uint256) public lotteryRequestIds;
-    mapping(address => address) public collectionWinners;
 
     address payable public feeAccount =  payable(address(this));
     address[] public CollectionAddresses;
-    address public winner;
     uint256 public feePercent = 2;
     uint256 public getNFTCount; 
     uint256 private _ItemIdsCounter;   
     uint256 public totalFeesCollected; 
+    uint256 totalEscrowedAmount;
+
     ChainlinkVRF public vrfContract;
 
     event TokenCreated(address, address);
@@ -67,6 +67,12 @@ contract Marketplace is Ownable(msg.sender), ReentrancyGuard, AutomationCompatib
      bool allSold;
    }
 
+  struct WinnerInfo {
+     address winnerAddress;
+     uint256 winningTokenId;
+  }
+
+  mapping(address => WinnerInfo) public collectionWinners;
   mapping(address => CollectionInfo) public collectionInfo;
 
     function createToken(
@@ -184,7 +190,6 @@ function purchaseItem(address nftContract, uint256 tokenId) external payable non
     uint256 itemPrice = item.price;
     require(msg.value >= _totalPrice, "Not enough ether to cover item price and market fee");
     require(!item.sold, "Item already sold");
-    uint256 feeAmount = calculateFee(itemPrice);
     uint256 escrowAmount = itemPrice; 
     item.sold = true; 
     item.escrowAmount += escrowAmount;
@@ -228,7 +233,10 @@ function getAllTokenId(address tokenContractAddress) public view returns (uint[]
     } 
     return ret;
 }
-  
+  function getAllCollectionAddresses() public view returns (address[] memory) {
+    return CollectionAddresses;
+  } 
+
   function getAllContractAddresses() public view returns (address[] memory) {
     uint256 totalContracts = CollectionAddresses.length;
     uint256 senderContractCount = tokens[msg.sender].length;
@@ -311,10 +319,11 @@ function playLottery(address collectionAddress, uint256 requestId) internal {
 
     (bool fulfilled, uint256 randomTokenNumber) = getRequestStatus(requestId);
     require(fulfilled, "Random number not fulfilled");
-    winner = getWinnerAddress(collectionAddress, requestId);
-    collectionWinners[collectionAddress] = winner;
+   
+   (address winner, ) = getWinnerAddress(collectionAddress, requestId);
+    collectionWinners[collectionAddress] = WinnerInfo(winner, randomTokenNumber);
 
-    uint256 totalEscrowedAmount = calculateTotalEscrowedAmount(collectionAddress);
+    totalEscrowedAmount = calculateTotalEscrowedAmount(collectionAddress);
 
     // Calculate the winner's prize directly from the escrow amount.
     uint256 winnerPrize = (totalEscrowedAmount * info.winnerPercentage) / 100;
@@ -362,19 +371,21 @@ function calculateFee(uint256 amount) private view returns (uint256) {
     return (amount * feePercent) / 100;
 }
 
-  function getWinnerAddress(address collectionAddress, uint256 requestId) public view returns (address) {
+ function getWinnerAddress(address collectionAddress, uint256 requestId) public view returns (address, uint256) {
     (bool fulfilled, uint256 randomTokenNumber) = getRequestStatus(requestId);
 
     require(fulfilled, "Random number not fulfilled");
 
     MarketItem storage winningItem = marketItems[collectionAddress][randomTokenNumber];
 
-    return winningItem.owner;
+    return (winningItem.owner, randomTokenNumber);
 }
 
-function getCollectionWinner(address collectionAddress) external view returns (address) {
-        return collectionWinners[collectionAddress];
-    }
+function getCollectionWinner(address collectionAddress) external view returns (address, uint256) {
+    WinnerInfo storage winnerInfo = collectionWinners[collectionAddress];
+    return (winnerInfo.winnerAddress, winnerInfo.winningTokenId);
+}
+
 function checkUpkeep(bytes calldata /* checkData */) external view override returns (bool upkeepNeeded, bytes memory performData) {
     for (uint i = 0; i < CollectionAddresses.length; i++) {
         address collectionAddress = CollectionAddresses[i];

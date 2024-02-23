@@ -5,7 +5,7 @@ import { LuckyPandaContext } from "../context/LuckyPandaContext";
 import { MarketplaceContractABI, MarketplaceContractAddress } from "@/app/constants/abi";
 const ethers = require("ethers");
 
-export default function LuckyDrawCollection() {
+export default function NFTReadership() {
   const [Img, setImg] = useState([]);
   const [allTokenIds, setAllTokenIds] = useState();
   const [tokenAddresses, setTokenAddresses] = useState([]);

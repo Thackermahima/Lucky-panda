@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { LuckyPandaContext } from "../context/LuckyPandaContext";
 import { MarketplaceContractABI, MarketplaceContractAddress } from "@/app/constants/abi";
 import axios from "axios";
+const ethers = require("ethers");
 
 export default function AllCollections() {
 
