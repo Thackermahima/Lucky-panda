@@ -1,4 +1,4 @@
-export const MarketplaceContractAddress = '0x54aE85e193b1ccC09A1bb21D9bEdBA9A1c365bA9'; 
+export const MarketplaceContractAddress = '0x03e886CdC66c55c2dbF5F54E54bf7856D9888366'; 
 
 export const MarketplaceContractABI = [
 	{
@@ -477,6 +477,19 @@ export const MarketplaceContractABI = [
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllCollectionAddresses",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "",
+				"type": "address[]"
 			}
 		],
 		"stateMutability": "view",
@@ -1741,4 +1754,4 @@ export const ChainlinkVRFContract = [
 	}
 ]
 
-export const ChinlinkVRFAddress = '0x45F4654cf37C792FdBA7f7D0533803A11f1c9088';
+export const ChinlinkVRFAddress = '0x3Ef7CcE5EAddc91D269E3b1c06d1856D8CD14C87';

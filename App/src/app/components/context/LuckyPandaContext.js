@@ -29,6 +29,7 @@ export const LuckyPandaContextProvider = (props) => {
     const [collectionUris, setCollectionUris] = useState([]);
     const [soldItems, setSoldItems] = useState([]);
     const [mycollectionUris, setMyCollectionUris] = useState([]);
+    const [allCollectionUris, setAllCollectionUris] = useState([]);
 
     const notify = () => toast("NFT Created Successfully !!");
 
@@ -233,7 +234,7 @@ if (txc.status === 1) {
         const getRequestStatus = await lotteryContract.getRequestStatus(
           getReqId.toString()
         );
-        console.log(getRequestStatus[1], "getRequestStatus");
+        console.log(getRequestStatus.toString(), "getRequestStatus");
         // const getWinner = await lotteryContract.getCollectionWinner(tokenContractAddress);
   
         // console.log(getWinner);
@@ -316,7 +317,35 @@ if (txc.status === 1) {
               console.error("Error fetching my collections: ", error);
             }    
     }
+    async function getAllContractCollection(){
+      const accounts = await window.ethereum.request({
+              method: "eth_requestAccounts",
+            });
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const MarketpaceContract = new ethers.Contract(
+              MarketplaceContractAddress,
+              MarketplaceContractABI,
+              signer
+            );
+     
+      
+      const allContractAddresses = await MarketpaceContract.getAllCollectionAddresses();
+      console.log(allContractAddresses, "allContractAddress");
+      const allcollectionuris = await Promise.all(
+        allContractAddresses.map(async(addrs) => {
+          const uri = await MarketpaceContract.getCollectionUri(addrs);
+         const winnerInfo = await MarketpaceContract.getCollectionWinner(addrs)
+         console.log(winnerInfo, "winnerInfo");
+          console.log(addrs, "addrs from collectionuris");
+          console.log(uri, "uri from collectionuris");
+          return {address: addrs, uri: uri }
+        })
     
+        );
+        setAllCollectionUris(allcollectionuris);
+    }
+
     const Item = {
       name: name,
       symbol: symbol,
@@ -353,7 +382,9 @@ if (txc.status === 1) {
           getAllCollection,
           collectionUris,
           getAllMyCollection,
-          mycollectionUris
+          mycollectionUris,
+          getAllContractCollection,
+          allCollectionUris
         }}
         >
           {props.children} 
