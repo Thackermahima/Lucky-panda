@@ -230,6 +230,76 @@
   padding: 10px 0; /* Adjust padding to fine-tune vertical positioning */
 }
 
+/* Set a background color, and adjust padding and shadow for a sleek look */
+.navbar {
+  /* background-color: #ffffff; A light or white background gives a clean look */
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); Subtle shadow for depth */
+  padding: 1rem 0; /* Adjust top and bottom padding for vertical spacing */
+}
+
+/* Logo image adjustments */
+.navbar-brand img {
+  height: 60px; /* Adjust logo height for balance */
+  width: auto; /* Maintain aspect ratio */
+  transition: height 0.3s; /* Smooth transition for any height changes */
+}
+
+/* Navigation links styling */
+.navbar-nav .nav-link {
+  color: #333; /* Dark gray for contrast */
+  font-weight: 500; /* Medium font weight for readability */
+  padding: 0.5rem 1rem; /* Spacing around the links */
+  transition: color 0.3s; /* Smooth transition for hover effect */
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus {
+  color: #0056b3; /* Highlight color on hover or focus */
+}
+
+/* Dropdown menu styling */
+.dropdown-menu {
+  border: none; /* Remove default border */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Consistent shadow with navbar */
+  padding: 1rem; /* Spacing inside the dropdown */
+}
+
+.dropdown-item {
+  color: #333; /* Match link color */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transitions for hover */
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #f8f9fa; /* Light background on hover for dropdown items */
+  color: #0056b3; /* Highlight color */
+}
+
+/* Wallet connect button styling */
+.btn-outline-secondary {
+  color: #333; /* Match link color */
+  border-color: #ced4da; /* Subtle border color */
+  transition: color 0.3s, background-color 0.3s, border-color 0.3s; /* Smooth transitions */
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  color: #fff; /* White text on hover */
+  background-color: #0056b3; /* Highlight background color */
+  border-color: #0056b3; /* Matching border color */
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .navbar {
+    padding: 0.5rem 0; /* Less padding on smaller screens */
+  }
+
+  .navbar-brand img {
+    height: 50px; /* Smaller logo on mobile */
+  }
+}
+
 @media (min-width: 992px) { /* Adjusting for large screens */
   .navbar .dropdown-menu {
     left: auto; /* Resetting default positioning */
