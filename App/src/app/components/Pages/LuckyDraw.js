@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useContext} from "react";
 import { LuckyPandaContext } from "../context/LuckyPandaContext";
 import axios from "axios";
+import { Link } from 'react-router-dom';
 
 export default function LuckyDraw() {
 
@@ -27,6 +28,9 @@ export default function LuckyDraw() {
            console.log(response,"response");
             let obj = {};
             obj.address = collection.address;
+            obj.hasWinner = collection.hasWinner;
+            obj.winnerAddress = collection.winnerAddress;
+            obj.winningTokenId = collection.winningTokenId;
             obj.name = response.data.name;
             obj.price = response.data.tokenPrice;
             // tokenIds.map((id) => {
@@ -51,25 +55,39 @@ export default function LuckyDraw() {
       },[allCollectionUris])
 
     return(
-        <div className="container py-5">
-      <h2 className="text-center mb-4">And The Winner Is..</h2>
+      <div className="container py-5">
+      <h2 className="text-center mb-4">And The Winner Is...</h2>
       <div className="row g-4">
-        {
-          Img.map((i) => (
-            <div className="col-12 col-md-6 col-lg-4" key={i.images[0].tokenID}> {/* Adjust the column sizes as needed */}
-              <div className="card h-100">
-                <img src={i.images[0].url} className="card-img-top" width='230px' height='230px' alt={`${i.name}'s collection`} />
-                <div className="card-body">
-                    <h5 className="card-title">Name of Collection: {i.name}</h5>
-                    <p className="card-text">Collection address: {i.address}</p>
-
+        {Img.map((i, index) => (
+          <div className="col-12 col-md-6 col-lg-4" key={i.images[0].tokenID}>
+            <div className="card h-100 shadow-sm">
+              <img src={i.images[0].url} className="card-img-top" alt={`${i.name}'s collection`} />
+              <div className="card-body">
+                <h5 className="card-title">{i.name}'s Collection</h5>
+                <p className="card-text text-muted mb-2">Collection Address: <span className="text-primary">{i.address}</span></p>
+                <div className="card-text mb-3">
+                  {i.hasWinner ? (
+                    <>
+                      <span className="badge rounded-pill bg-success">Winner Declared</span>
+                      <div className="mt-2">
+                        <p className="mb-1"><strong>Winner:</strong> {i.winnerAddress}</p>
+                        <p><strong>Winning Token ID:</strong> {i.winningTokenId.toString()}</p>
+                      </div>
+                    </>
+                  ) : (
+                    <span className="badge rounded-pill bg-warning text-dark">Winner will be declared soon</span>
+                  )}
                 </div>
+                <Link to ={`/all-collections/${i.address}`} className="nav-link">   
+                <button className="btn btn-outline-primary w-100 mt-2">View Collection</button>
+                </Link>
               </div>
             </div>
-          ))
-        }
+          </div>
+        ))}
       </div>
     </div>
+    
     )
 
 }

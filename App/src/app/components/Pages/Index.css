@@ -219,6 +219,17 @@
   color: #ccc; /* Icon hover color */
 }
 
+.navbar {
+  height: 100px; /* Adjust this value to fit your design */
+  align-items: center; /* This will vertically center the logo and nav items */
+}
+
+/* If your logo height exceeds the navbar height, you might need to adjust padding or size */
+.navbar-brand img {
+  max-height: 100%; /* This ensures the logo is contained within the navbar height */
+  padding: 10px 0; /* Adjust padding to fine-tune vertical positioning */
+}
+
 @media (min-width: 992px) { /* Adjusting for large screens */
   .navbar .dropdown-menu {
     left: auto; /* Resetting default positioning */

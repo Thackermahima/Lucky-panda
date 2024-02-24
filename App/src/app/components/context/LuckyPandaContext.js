@@ -335,13 +335,18 @@ if (txc.status === 1) {
       const allcollectionuris = await Promise.all(
         allContractAddresses.map(async(addrs) => {
           const uri = await MarketpaceContract.getCollectionUri(addrs);
-         const winnerInfo = await MarketpaceContract.getCollectionWinner(addrs)
-         console.log(winnerInfo, "winnerInfo");
-          console.log(addrs, "addrs from collectionuris");
-          console.log(uri, "uri from collectionuris");
-          return {address: addrs, uri: uri }
+          const [winnerAddress, winningTokenId]= await MarketpaceContract.getCollectionWinner(addrs);
+           // Add a check for the default address (0x0) which means no winner yet
+          const hasWinner = winnerAddress !== '0x0000000000000000000000000000000000000000';
+          console.log({ address: addrs, uri: uri, hasWinner, winnerAddress, winningTokenId }, "collection with winner info");
+          return {
+            address: addrs, 
+            uri: uri, 
+            hasWinner:hasWinner,
+            winnerAddress: winnerAddress,
+            winningTokenId: winningTokenId
+          }
         })
-    
         );
         setAllCollectionUris(allcollectionuris);
     }

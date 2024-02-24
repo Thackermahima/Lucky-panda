@@ -1,6 +1,6 @@
 import React from 'react';
 import './Index.css';
-
+import { Link } from 'react-router-dom';
 export default function Landing1() {
     return (
         <div className="hero-section hero vh-100 d-flex align-items-center">
@@ -13,7 +13,11 @@ export default function Landing1() {
               <div className="col-lg-6 my-auto">
                 <h1 className="display-4">Discover the Magic of NFTs</h1>
                 <p className="lead">Join the Lucky Panda community and uncover treasures beyond imagination.</p>
+
+                <Link to="/NFT-collections" className="nav-link">
                 <button className="btn btn-primary btn-lg">Explore Now</button>
+                </Link>
+                
               </div>
               <div className="col-lg-6 d-none d-lg-block">
                 <div className="imageContainer">

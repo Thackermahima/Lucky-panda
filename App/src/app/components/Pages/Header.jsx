@@ -21,8 +21,11 @@ export default function Header() {
   return (
     <header>
       <nav className="navbar navbar-expand-lg">
-        <div className="container d-flex justify-content-between align-items-center py-2 ">
-          <Link to="/" className="navbar-brand">LuckyPanda</Link>
+        <div className="container d-flex justify-content-between align-items-center  ">
+          <Link to="/" className="navbar-brand">
+          <img src="/LuckyPandaLogo.png" alt="LuckyPanda Logo" style={{ height: '140px'}} /> {/* Adjust the height as needed */}
+  
+          </Link>
           <div className="d-flex flex-row align-items-center">
             <ul className="navbar-nav">
               <li className="nav-item">
