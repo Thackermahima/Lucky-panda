@@ -80,7 +80,7 @@ export default function AllCollections() {
                   <div className="card h-100 text-center">
                     <img src={img.url} className="card-img-top" alt={`${i.name}'s collection`} style={{ width: '100%', height: 'auto' }} />
                     <div className="card-body">
-                      <h5 className="card-title">tokenId: {img.tokenID}</h5>
+                      <h5 className="card-title">Ticket Id: {img.tokenID}</h5>
                     </div>
                   </div>
                 </div>

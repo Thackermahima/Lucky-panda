@@ -71,7 +71,7 @@ export default function LuckyDraw() {
                       <span className="badge rounded-pill bg-success">Winner Declared</span>
                       <div className="mt-2">
                         <p className="mb-1"><strong>Winner:</strong> {i.winnerAddress}</p>
-                        <p><strong>Winning Token ID:</strong> {i.winningTokenId.toString()}</p>
+                        <p><strong>Winner Ticket Id:</strong> {i.winningTokenId.toString()}</p>
                       </div>
                     </>
                   ) : (

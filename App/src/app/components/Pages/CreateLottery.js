@@ -60,12 +60,12 @@ export default function CreateLottery() {
               </div>
   
               <div className="mb-3">
-                <label htmlFor="totalTokenSupply" className="form-label">Total Token Supply</label>
+                <label htmlFor="totalTokenSupply" className="form-label">Total Lottery tickets</label>
                 <input
                   type="number"
                   className="form-control"
                   id="totalTokenSupply"
-                  placeholder="Enter token supply"
+                  placeholder="Enter total lottery tickets"
                   value={tokenQuantity}
                   onChange={tokenQuantityEvent}
                 />
