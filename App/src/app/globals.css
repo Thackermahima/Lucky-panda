@@ -5,26 +5,28 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 240, 245, 249; /* Light blue shade */
-  --background-end-rgb: 222, 228, 230; /* Slightly darker blue shade */
+  --background-start-rgb: 240, 245, 249;
+  /* Light blue shade */
+  --background-end-rgb: 222, 228, 230;
+  /* Slightly darker blue shade */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 25, 42, 86; /* Dark blue shade */
-    --background-end-rgb: 15, 32, 76; /* Even darker blue */
+    --background-start-rgb: 25, 42, 86;
+    /* Dark blue shade */
+    --background-end-rgb: 15, 32, 76;
+    /* Even darker blue */
   }
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    to bottom,
-    rgb(var(--background-start-rgb)),
-    rgb(var(--background-end-rgb))
-  );
-  /* Ensure the gradient covers the entire page */
+  background: linear-gradient(to bottom,
+      rgb(var(--background-start-rgb)),
+      rgb(var(--background-end-rgb)));
   min-height: 100vh;
+
   background-attachment: fixed;
 }

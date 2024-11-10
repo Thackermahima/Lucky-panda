@@ -1,6 +1,9 @@
-import React, { createContext, useState } from "react";
-import { create } from "ipfs-http-client";
+import React, { createContext, useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { createHelia } from 'helia';
+import { unixfs } from '@helia/unixfs';
+import { json } from '@helia/json';
+
 import {
   MarketplaceContractAddress,
   MarketplaceContractABI,
@@ -8,392 +11,299 @@ import {
   ChainlinkVRFContract,
   ChinlinkVRFAddress
 } from '../../constants/abi';
-const ethers = require("ethers") 
+const ethers = require("ethers");
 
 export const LuckyPandaContext = createContext();
 
 export const LuckyPandaContextProvider = (props) => {
-    const [name, setName] = useState("");
-    const [symbol, setSymbol] = useState("");
-    const [tokenPrice, setTokenPrice] = useState("");
-    const [tokenQuantity, setTokenQuantity] = useState("");
-    const [uploadImg, setUploadedImg] = useState("");
-    const [resultTime, setResultTime] = useState(1);
-    const [winnerPercentage, setWinnerPercentage] = useState(10);
-    const [loading, setLoading] = useState(false);
-    const [AllTokenIds, setAllTokenIds] = useState();
-    const [ImgArr, setImgArr] = useState([]);
-    const [AllFilesArr, setAllFilesArr] = useState([]);
-    const [AllTokenURIs, setAllTokenURIs] = useState([]);
-    const [getCollection, setGetCollection] = useState();
-    const [collectionUris, setCollectionUris] = useState([]);
-    const [soldItems, setSoldItems] = useState([]);
-    const [mycollectionUris, setMyCollectionUris] = useState([]);
-    const [allCollectionUris, setAllCollectionUris] = useState([]);
+  const [name, setName] = useState("");
+  const [symbol, setSymbol] = useState("");
+  const [tokenPrice, setTokenPrice] = useState("");
+  const [tokenQuantity, setTokenQuantity] = useState("");
+  const [uploadImg, setUploadedImg] = useState(null);
+  const [resultTime, setResultTime] = useState(1);
+  const [winnerPercentage, setWinnerPercentage] = useState(10);
+  const [loading, setLoading] = useState(false);
+  const [AllTokenIds, setAllTokenIds] = useState();
+  const [ImgArr, setImgArr] = useState([]);
+  const [AllFilesArr, setAllFilesArr] = useState([]);
+  const [AllTokenURIs, setAllTokenURIs] = useState([]);
+  const [getCollection, setGetCollection] = useState();
+  const [collectionUris, setCollectionUris] = useState([]);
+  const [soldItems, setSoldItems] = useState([]);
+  const [mycollectionUris, setMyCollectionUris] = useState([]);
+  const [allCollectionUris, setAllCollectionUris] = useState([]);
+  const [helia, setHelia] = useState(null);
+  const [fs, setFs] = useState(null);
+  const [jsonHandler, setJsonHandler] = useState(null)
+  const [nodeId, setNodeId] = useState(null);
+  const [isOnline, setIsOnline] = useState(false);
 
-    const notify = () => toast("NFT Created Successfully !!");
+  const notify = () => toast("NFT Created Successfully !!");
 
-    const nameEvent = (e) => {
-      setName(e.target.value);
-    };
-    const symbolEvent = (e) => {
-      setSymbol(e.target.value);
-    };
-    const tokenPriceEvent = (e) => {
-      setTokenPrice(e.target.value || null);
-    };
-    const tokenQuantityEvent = (e) => {
-      setTokenQuantity(e.target.value);
-    };
-    const tokenImgEvent = (e) => {
-      const file = e.target.files[0];
-      setUploadedImg(file);
-    };  
-    const tokenResultTimeEvent = (e) => {
-      setResultTime(e.target.value);
-    };
-    const tokenWinnerPercentageEvent = (e) => {
-      // const percentage = parseInt(e.target.value);
-      setWinnerPercentage(e.target.value);
-    };
-    const projectId = process.env.REACT_NEXT_APP_INFURA_PROJECT_KEY;
-    const projectSecret = process.env.REACT_NEXT_APP_INFURA_SECRET_KEY;
-    const auth =
-      "Basic " + Buffer.from(projectId + ":" + projectSecret).toString("base64");
-    const ifpsConfig = {
-      host: "ipfs.infura.io",
-      port: 5001,
-      protocol: "https",
-      headers: {
-        authorization: auth,
-      },
-    };
-    const ipfs = create(ifpsConfig);
-    const addDataToIPFS = async (metadata) => {
-      const ipfsHash = await ipfs.add(metadata);
-      // console.log(ipfsHash.cid, "IPFSHash cid");
-      console.log(ipfsHash.path, "IPFSHash path");
-      return ipfsHash.path;
-    };
-    const handleImageUpload = async (imageFile) => {
+  // Initialize Helia instance on component mount
+  useEffect(() => {
+    const initHelia = async () => {
       try {
-        const imageBuffer = await imageFile.arrayBuffer();
-        const ipfsHash = await ipfs.add(imageBuffer);
-        const ipfsUrl = `https://ipfs.io/ipfs/${ipfsHash.path}`;
-        return ipfsUrl;
+        const heliaNode = await createHelia();
+        const fsHandler = unixfs(heliaNode);
+        const jsonInstance = json(heliaNode);
+        const id = heliaNode.libp2p.peerId.toString();
+        setHelia(heliaNode);
+        setFs(fsHandler);
+        setJsonHandler(jsonInstance); setNodeId(id);
+        setIsOnline(heliaNode.libp2p.status === 'started');
       } catch (error) {
-        console.error('Error uploading image to IPFS:', error);
-        return null;
+        console.error("Failed to initialize Helia:", error);
       }
     };
-    const onFormSubmit = async (e) => {
-      e.preventDefault();
-      setLoading(true);
-    console.log(Item, "Item");
-      try {
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        const address = accounts[0];
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        console.log(signer.getChainId, "getChainId");
-        const lotteryContract = new ethers.Contract(
-          MarketplaceContractAddress,
-          MarketplaceContractABI,
-          signer
-        );
-       
+    initHelia();
+  }, []);
 
-    //     console.log(lotteryContract, "lotteryContract");
-    // console.log(name, symbol);
-    // console.log(winnerPercentage,"winnerPercentage");
-    // const winnerPercentageValue = parseInt(winnerPercentage, 10)
-    // console.log(winnerPercentageValue, "winnerPercentageValue");
-    // const resultTimeValue = resultTime * 60;
-    // console.log(resultTimeValue, "result time");
-   
-        let transactionCreate = await lotteryContract.createToken(
-          name,
-          symbol,
-          resultTime * 60,
-          winnerPercentage    
-              );  
-        console.log(transactionCreate, "transactionCreate");
-        let txc = await transactionCreate.wait();
-        let tokenContractAddress;
-if (txc.status === 1) {
-  setLoading(false);
-  console.log(txc, "Successfully created!");
 
-  if (txc.logs && txc.logs.length > 0) {
-    const logs = txc.logs;
-     tokenContractAddress = logs[0].args[1]; // Assuming the contract address is in the args array
-    console.log(tokenContractAddress, "Token contract address");
-     let userAdd = localStorage.getItem("address");
-        localStorage.setItem("tokenContractAddress", tokenContractAddress);
-  } else {
-    console.error("No logs found in the transaction receipt.");
+  const nameEvent = (e) => setName(e.target.value);
+  const symbolEvent = (e) => setSymbol(e.target.value);
+  const tokenPriceEvent = (e) => setTokenPrice(e.target.value || null);
+  const tokenQuantityEvent = (e) => setTokenQuantity(e.target.value);
+  const tokenImgEvent = (e) => setUploadedImg(e.target.files ? e.target.files[0] : null);
+  const tokenResultTimeEvent = (e) => setResultTime(e.target.value);
+  const tokenWinnerPercentageEvent = (e) => setWinnerPercentage(e.target.value);
+
+  // Function to add data to IPFS using Helia
+  const addDataToIPFS = async (content) => {
+    try {
+      if (!fs || !jsonHandler) throw new Error("IPFS handlers not initialized");
+
+      let cid;
+      if (typeof content === "string") {
+        // Handle string content
+        cid = await fs.addBytes(new TextEncoder().encode(content));
+      } else if (content instanceof Blob || content instanceof File) {
+        // Handle Blob/File content
+        const buffer = await content.arrayBuffer();
+        cid = await fs.addBytes(new Uint8Array(buffer));
+      } else if (typeof content === "object") {
+        // Handle JSON content
+        cid = await jsonHandler.add(content);
+      } else {
+        throw new Error("Unsupported content type");
+      }
+
+      return cid.toString();
+    } catch (error) {
+      console.error("Error adding data to IPFS:", error);
+      throw error;
+    }
+  };
+
+
+  // Function to handle image upload
+  const handleImageUpload = async (imageFile) => {
+    try {
+      if (!imageFile) throw new Error("No image file provided");
+      const cid = await addDataToIPFS(imageFile);
+      console.log(cid, "cid");
+
+      return `https://ipfs.io/ipfs/${cid}`;
+    } catch (error) {
+      console.error('Error uploading image to IPFS:', error);
+      toast.error("Failed to upload image");
+      return null;
+    }
+  };
+  const onFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const lotteryContract = new ethers.Contract(
+        MarketplaceContractAddress,
+        MarketplaceContractABI,
+        signer
+      );
+
+      let transactionCreate = await lotteryContract.createToken(
+        name,
+        symbol,
+        resultTime * 60,
+        winnerPercentage
+      );
+      let txc = await transactionCreate.wait();
+      console.log(txc);
+
+      const metadata = {
+        name,
+        symbol,
+        tokenPrice,
+        tokenQuantity,
+        resultTime,
+        winnerPercentage,
+        createdAt: new Date().toISOString(),
+      };
+      console.log(metadata, "metadata");
+
+
+      // Add metadata to IPFS
+      const metadataCid = await addDataToIPFS(metadata);
+      console.log(metadataCid, "metadataCID");
+
+      const uri = `https://ipfs.io/ipfs/${metadataCid}`;
+      console.log(uri, "uri");
+
+      notify();
+
+      const setCollectionOfUri = await lotteryContract.setCollectionUri(
+        MarketplaceContractAddress,
+        uri
+      );
+      console.log(setCollectionOfUri, "setCollectionUri");
+
+      await setCollectionOfUri.wait();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      setName("");
+      setTokenPrice("");
+      setTokenQuantity("");
+      setSymbol("");
+      setUploadedImg(null);
+      setLoading(false);
+    }
+  };
+
+  async function getAllCollection() {
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const MarketpaceContract = new ethers.Contract(
+      MarketplaceContractAddress,
+      MarketplaceContractABI,
+      signer
+    );
+
+    const allContractAddresses = await MarketpaceContract.getAllContractAddresses();
+    console.log(allContractAddresses, "allContractAddresses");
+
+    const collectionuris = await Promise.all(
+      allContractAddresses.map(async (addrs) => {
+        const uri = await MarketpaceContract.getCollectionUri(addrs);
+        const soldItems = await MarketpaceContract.getAllSoldItems(addrs);
+        return { address: addrs, uri: uri, soldItems: soldItems.toString() };
+      })
+    );
+    setCollectionUris(collectionuris);
+    setSoldItems(soldItems);
   }
-} else {
-  console.error("Transaction failed.");
-}
-       
-    console.log(tokenPrice,"tokenPrice");
-    console.log(ethers.parseUnits(tokenPrice.toString(), "ether"),"tokenPrice");
-    console.log(tokenContractAddress, "tokenContractAddress");
-    console.log(tokenQuantity, "tokenQuantiy");
-        let transactionBulkMint = await lotteryContract.bulkMintERC721(
-          tokenContractAddress,
-          0,
-          tokenQuantity,
-        );
-        let txb = await transactionBulkMint.wait();
-        if (txb) {
-          console.log("Tokens minted successfully!");
-        }
-        const nftContract  = new ethers.Contract(
-          tokenContractAddress,
-          NFTContractABI,
-          signer
-        );
-        console.log(nftContract, "NFTContract");
-       
-         
-          let approvalNFT = await nftContract.setApprovalForAll(MarketplaceContractAddress, true);    
-          let txApprovalNFT = await approvalNFT.wait();
-          if (txApprovalNFT) {
-            console.log("Token Transfer Approved!");
-          }
-          console.log(tokenContractAddress,tokenQuantity,ethers.parseUnits(tokenPrice.toString(), "ether"), "tokenQuantity after approval");
-          let transactionCreateItem = await lotteryContract.createMarketItem(
-            tokenContractAddress,
-            0,
-            tokenQuantity,
-            ethers.parseUnits(tokenPrice.toString(), "ether"),
-          );
-          let txI = await transactionCreateItem.wait();
-          if (txI) {
-            console.log("Tokens listed Successfully!");
-          }
-        
-        let tokenIds = await lotteryContract.getAllTokenId(tokenContractAddress);
-        var imgTokenUrl = await Promise.all(
-          tokenIds.map(async (tokenId) => {
-            console.log(uploadImg,"uploadImg");
-            const ipfsHash = await addDataToIPFS(uploadImg);
-            console.log(ipfsHash,"ipfsHash");
-            const imageUrl = {
-              url: `https://superfun.infura-ipfs.io/ipfs/${ipfsHash}`,
-              tokenID: tokenId.toString(),
-            };
-            console.log(imageUrl,"imageUrl");
-            return imageUrl;
-          })
-        );
-    
-        const blob = new Blob(
-          [
-            JSON.stringify({
-              name,
-              symbol,
-              tokenPrice,
-              tokenQuantity,
-              imgTokenUrl,
-              resultTime,
-            }),
-          ],
-          { type: "application/json" }
-        );
-        const files = [new File([blob], "data.json")];
-        const path = await addDataToIPFS(files[0]);
-        const uri = `https://superfun.infura-ipfs.io/ipfs/${path}`;
-        console.log(uri, "last uri");
-    
-        notify();
-       
-        const setCollectionOfUri = await lotteryContract.setCollectionUri(
-          tokenContractAddress,
-          uri
-        );
-        let txs = await setCollectionOfUri.wait();
-        if (txs) {
-          console.log(setCollectionOfUri, "setCollectionOfUris");
-        }
-        const callRequestRandomWords = await lotteryContract.callRequestRandomWords(tokenContractAddress);
-        const txrw = await callRequestRandomWords.wait();
-        if (txrw.status === 1) {
-          setLoading(false);
-          console.log(txrw, "Successfully generated!");
-        }
-        await new Promise(resolve => setTimeout(resolve, 5000));
-      const getReqId = await lotteryContract.getRequestIdForCollection(tokenContractAddress);
-      console.log(getReqId.toString(), "reqId");
 
-      await new Promise(resolve => setTimeout(resolve, 10000));
-        const getRequestStatus = await lotteryContract.getRequestStatus(
-          getReqId.toString()
-        );
-        console.log(getRequestStatus.toString(), "getRequestStatus");
-        // const getWinner = await lotteryContract.getCollectionWinner(tokenContractAddress);
-  
-        // console.log(getWinner);
-      } catch (error) {
-        console.error("Error submitting form:", error);
-      } finally {
-        setName("");
-        setTokenPrice("");
-        setTokenQuantity("");
-        setSymbol("");
-        setUploadedImg("");
-        setLoading(false);
-      }
-    };
+  async function getAllMyCollection() {
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const MarketpaceContract = new ethers.Contract(
+      MarketplaceContractAddress,
+      MarketplaceContractABI,
+      signer
+    );
 
-    async function getAllCollection(){
-      let getCollectionOfUri;
-      const accounts = await window.ethereum.request({
-              method: "eth_requestAccounts",
-            });
-            const address = accounts[0];
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const signer = await provider.getSigner();
-            const MarketpaceContract = new ethers.Contract(
-              MarketplaceContractAddress,
-              MarketplaceContractABI,
-              signer
-            );
-     
-      
-      const allContractAddresses = await MarketpaceContract.getAllContractAddresses();
-      console.log(allContractAddresses, "allContractAddress");
+    try {
+      const myCollectionAddresses = await MarketpaceContract.getOwnerContractAddresses();
       const collectionuris = await Promise.all(
-        allContractAddresses.map(async(addrs) => {
+        myCollectionAddresses.map(async (addrs) => {
           const uri = await MarketpaceContract.getCollectionUri(addrs);
-          const soldItems = await MarketpaceContract.getAllSoldItems(addrs);
-    
-          // const tokenId = await MarketpaceContract.getAllTokenId(addrs);
-          // console.log(tokenId, "tokenIds");
-          console.log(addrs, "addrs from collectionuris");
-          console.log(uri, "uri from collectionuris");
-          return {address: addrs, uri: uri, soldItems: soldItems.toString()};
+          return { address: addrs, uri: uri };
         })
-    
-        );
-      setCollectionUris(collectionuris);
-      setSoldItems(soldItems);
-    
-    }
+      );
+      console.log(collectionUris, "colle");
 
-    async function getAllMyCollection(){
-      const accounts = await window.ethereum.request({
-              method: "eth_requestAccounts",
-            });
-            const address = accounts[0];
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const signer = await provider.getSigner();
-            const MarketpaceContract = new ethers.Contract(
-              MarketplaceContractAddress,
-              MarketplaceContractABI,
-              signer
-            );
-     
-      
-            try {
-              const myCollectionAddresses = await MarketpaceContract.getOwnerContractAddresses();
-              const collectionuris = await Promise.all(
-                myCollectionAddresses.map(async(addrs) => {
-                  const uri = await MarketpaceContract.getCollectionUri(addrs);              
-                  console.log(addrs, "addrs from collectionuris");
-                  console.log(uri, "uri from collectionuris");
-                  return {address: addrs, uri: uri};
-                })
-            
-                );
-              console.log(myCollectionAddresses, "myCollectionAddresses");
-              console.log(collectionuris, "collectionUriss");
-              setMyCollectionUris(collectionuris)
-            } catch (error) {
-              console.error("Error fetching my collections: ", error);
-            }    
+      setMyCollectionUris(collectionuris);
+    } catch (error) {
+      console.error("Error fetching my collections:", error);
     }
-    async function getAllContractCollection(){
-      const accounts = await window.ethereum.request({
-              method: "eth_requestAccounts",
-            });
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const signer = await provider.getSigner();
-            const MarketpaceContract = new ethers.Contract(
-              MarketplaceContractAddress,
-              MarketplaceContractABI,
-              signer
-            );
-     
-      
-      const allContractAddresses = await MarketpaceContract.getAllCollectionAddresses();
-      console.log(allContractAddresses, "allContractAddress");
-      const allcollectionuris = await Promise.all(
-        allContractAddresses.map(async(addrs) => {
-          const uri = await MarketpaceContract.getCollectionUri(addrs);
-          const [winnerAddress, winningTokenId]= await MarketpaceContract.getCollectionWinner(addrs);
-           // Add a check for the default address (0x0) which means no winner yet
-          const hasWinner = winnerAddress !== '0x0000000000000000000000000000000000000000';
-          console.log({ address: addrs, uri: uri, hasWinner, winnerAddress, winningTokenId }, "collection with winner info");
-          return {
-            address: addrs, 
-            uri: uri, 
-            hasWinner:hasWinner,
-            winnerAddress: winnerAddress,
-            winningTokenId: winningTokenId
-          }
-        })
-        );
-        setAllCollectionUris(allcollectionuris);
-    }
+  }
 
-    const Item = {
-      name: name,
-      symbol: symbol,
-      price: tokenPrice,
-      quantity: tokenQuantity,
-      imgURl: uploadImg,
-      resultTime: resultTime,
-      winnerPercentage: winnerPercentage, 
-    };
+  async function getAllContractCollection() {
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const MarketpaceContract = new ethers.Contract(
+      MarketplaceContractAddress,
+      MarketplaceContractABI,
+      signer
+    );
 
-    return(
-        <LuckyPandaContext.Provider
-        value={{
-          ImgArr,
-          AllTokenURIs,
-          name,
-          nameEvent,
-          symbol,
-          symbolEvent,
-          tokenPrice,
-          tokenPriceEvent,
-          tokenQuantity,
-          tokenQuantityEvent,
-          resultTime,
-          tokenResultTimeEvent,
-          uploadImg,
-          tokenImgEvent,
-          tokenWinnerPercentageEvent,
-          winnerPercentage,
-          loading,
-          onFormSubmit,
-          getCollection,
-          AllFilesArr,
-          getAllCollection,
-          collectionUris,
-          getAllMyCollection,
-          mycollectionUris,
-          getAllContractCollection,
-          allCollectionUris
-        }}
-        >
-          {props.children} 
-        </LuckyPandaContext.Provider>
-    )
-}
-  
+    const allContractAddresses = await MarketpaceContract.getAllCollectionAddresses();
+    console.log(allContractAddresses);
+
+    const allcollectionuris = await Promise.all(
+      allContractAddresses.map(async (addrs) => {
+        const uri = await MarketpaceContract.getCollectionUri(addrs);
+        const [winnerAddress, winningTokenId] = await MarketpaceContract.getCollectionWinner(addrs);
+        const hasWinner = winnerAddress !== '0x0000000000000000000000000000000000000000';
+        return {
+          address: addrs,
+          uri: uri,
+          hasWinner: hasWinner,
+          winnerAddress: winnerAddress,
+          winningTokenId: winningTokenId
+        }
+      })
+    );
+    setAllCollectionUris(allcollectionuris);
+  }
+
+  const Item = {
+    name: name,
+    symbol: symbol,
+    price: tokenPrice,
+    quantity: tokenQuantity,
+    imgURl: uploadImg,
+    resultTime: resultTime,
+    winnerPercentage: winnerPercentage,
+  };
+
+  return (
+    <LuckyPandaContext.Provider
+      value={{
+        ImgArr,
+        AllTokenURIs,
+        name,
+        nameEvent,
+        symbol,
+        symbolEvent,
+        tokenPrice,
+        tokenPriceEvent,
+        tokenQuantity,
+        tokenQuantityEvent,
+        resultTime,
+        tokenResultTimeEvent,
+        uploadImg,
+        tokenImgEvent,
+        tokenWinnerPercentageEvent,
+        winnerPercentage,
+        loading,
+        onFormSubmit,
+        getCollection,
+        AllFilesArr,
+        getAllCollection,
+        collectionUris,
+        getAllMyCollection,
+        mycollectionUris,
+        getAllContractCollection,
+        allCollectionUris,
+        handleImageUpload,
+        nodeId,
+        isOnline
+      }}
+    >
+      {props.children}
+    </LuckyPandaContext.Provider>
+  );
+};
